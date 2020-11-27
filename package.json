@@ -1,0 +1,35 @@
+{
+  "name": "guardian-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AAL-Guardian/guardian-backend.git"
+  },
+  "author": "Fabrizio Marconi @ Jef",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AAL-Guardian/guardian-backend/issues"
+  },
+  "homepage": "https://github.com/AAL-Guardian/guardian-backend#readme",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.64",
+    "@types/node": "^12.19.6",
+    "aws-sdk": "^2.798.0",
+    "serverless": "^2.12.0",
+    "serverless-dotenv-plugin": "^3.1.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.8.0",
+    "serverless-webpack": "^5.3.5",
+    "ts-loader": "^8.0.11",
+    "typescript": "^4.1.2",
+    "webpack": "^5.8.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "dependencies": {}
+}

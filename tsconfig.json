@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "commonjs",
+    "paths": {
+      "*": ["types/*"]
+    },
+    "sourceMap": true,
+    "target": "es6",
+    "lib": [
+      "es5",
+      "es6",
+      "dom",
+      "es2015",
+      "es2017",
+      "esnext",
+      "esnext.asynciterable"
+    ],
+    "experimentalDecorators": false,
+    "moduleResolution": "node",
+    "typeRoots": ["node_modules/@types"]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

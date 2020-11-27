@@ -1,0 +1,3 @@
+functions:
+  proxy:
+    handler: src/authorizers/iot.seniorDevice
