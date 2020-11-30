@@ -1,45 +1,9 @@
-
-type IoTAuthorizerEvent = {
-  token: string,
-  signatureVerified: boolean,
-  protocols: "tls" | "http" | "mqtt",
-  protocolData: {
-    tls: {
-      serverName: string
-    },
-    http: {
-      headers: {
-        [key: string]: string
-      },
-      queryString: string
-    },
-    mqtt: {
-      username: string,
-      password: string,
-      clientId: string
-    }
-  },
-  connectionMetadata: {
-    id: string
-  }
-}
-
-type IoTAuthorizeResponse = {
-  isAuthenticated: boolean, //A Boolean that determines whether client can connect.
-  principalId: string,  //A string that identifies the connection in logs.
-  disconnectAfterInSeconds: number,
-  refreshAfterInSeconds: number,
-  policyDocuments:
-  {
-    Version: string,
-    Statement: any[]
-  }[]
-}
-
-export async function seniorDevice(event: IoTAuthorizerEvent) {
-  console.log(event);
-  const region = 'eu-west-1';
-  const account = '517697470599';
+export default async function (event: IoTAuthorizerEvent, context: any) {
+  const extract = /arn:aws:lambda:(?<region>[a-z0-9\-]+):(?<account>[0-9]+):/.exec(context.invokedFunctionArn);
+  // const region = 'eu-west-1';
+  // const account = '517697470599';
+  const region = extract.groups.region;
+  const account = extract.groups.account;
   const baseArn = `arn:aws:iot:${region}:${account}`;
   const response = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
@@ -97,4 +61,41 @@ export async function seniorDevice(event: IoTAuthorizerEvent) {
   // console.log(response, context, callback);
   // callback(response);
   return response;
+}
+
+type IoTAuthorizerEvent = {
+  token: string,
+  signatureVerified: boolean,
+  protocols: "tls" | "http" | "mqtt",
+  protocolData: {
+    tls: {
+      serverName: string
+    },
+    http: {
+      headers: {
+        [key: string]: string
+      },
+      queryString: string
+    },
+    mqtt: {
+      username: string,
+      password: string,
+      clientId: string
+    }
+  },
+  connectionMetadata: {
+    id: string
+  }
+}
+
+type IoTAuthorizeResponse = {
+  isAuthenticated: boolean, //A Boolean that determines whether client can connect.
+  principalId: string,  //A string that identifies the connection in logs.
+  disconnectAfterInSeconds: number,
+  refreshAfterInSeconds: number,
+  policyDocuments:
+  {
+    Version: string,
+    Statement: any[]
+  }[]
 }

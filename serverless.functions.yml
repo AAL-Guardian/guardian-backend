@@ -1,3 +1,10 @@
 functions:
-  proxy:
-    handler: src/authorizers/iot.seniorDevice
+  iotSeniorAuthorizer:
+    handler: src/authorizers/iot.default
+  installSeniorApplication:
+    handler: src/apis/senior-installation.default
+    events:
+      - http:
+          path: /install
+          method: POST
+          cors: true
