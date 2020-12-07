@@ -1,10 +1,17 @@
 functions:
-  iotSeniorAuthorizer:
+  iotTokenAuthorizer:
     handler: src/authorizers/iot.default
   installSeniorApplication:
     handler: src/apis/senior-installation.default
     events:
       - http:
-          path: /install
+          path: /senior/install
+          method: POST
+          cors: true
+  installRobot:
+    handler: src/apis/robot-installation.default
+    events:
+      - http:
+          path: /robot/install
           method: POST
           cors: true

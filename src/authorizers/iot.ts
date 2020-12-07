@@ -1,3 +1,5 @@
+import { checkTokenValidity } from "../data/access-token";
+
 export default async function (event: IoTAuthorizerEvent, context: any) {
   const extract = /arn:aws:lambda:(?<region>[a-z0-9\-]+):(?<account>[0-9]+):/.exec(context.invokedFunctionArn);
   // const region = 'eu-west-1';
@@ -5,6 +7,15 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
   const region = extract.groups.region;
   const account = extract.groups.account;
   const baseArn = `arn:aws:iot:${region}:${account}`;
+  const valid = checkTokenValidity(event.protocolData.mqtt.username);
+  if (!valid) {
+    return {
+      isAuthenticated: true, //A Boolean that determines whether client can connect.
+      principalId: event.protocolData.mqtt.clientId,  //A string that identifies the connection in logs.
+    } as IoTAuthorizeResponse;
+  }
+
+
   const response = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
     principalId: event.protocolData.mqtt.clientId,  //A string that identifies the connection in logs.
@@ -58,8 +69,6 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
     ]
 
   } as IoTAuthorizeResponse;
-  // console.log(response, context, callback);
-  // callback(response);
   return response;
 }
 

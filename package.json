@@ -18,7 +18,9 @@
   "homepage": "https://github.com/AAL-Guardian/guardian-backend#readme",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.64",
+    "@types/mysql": "^2.15.16",
     "@types/node": "^12.19.6",
+    "@types/uuid": "^8.3.0",
     "aws-sdk": "^2.798.0",
     "serverless": "^2.12.0",
     "serverless-dotenv-plugin": "^3.1.0",
@@ -31,5 +33,9 @@
     "webpack-cli": "^4.2.0",
     "webpack-node-externals": "^2.5.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "knex": "^0.21.12",
+    "mysql": "^2.18.1",
+    "uuid": "^8.3.1"
+  }
 }
