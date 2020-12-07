@@ -1,5 +1,12 @@
 import { checkTokenValidity } from "../data/access-token";
 
+const cache: {
+  [key: string]: {
+    clientId: string,
+    expiration: string,
+    valid: boolean
+  }
+} = {}
 export default async function (event: IoTAuthorizerEvent, context: any) {
   const extract = /arn:aws:lambda:(?<region>[a-z0-9\-]+):(?<account>[0-9]+):/.exec(context.invokedFunctionArn);
   // const region = 'eu-west-1';
@@ -7,14 +14,23 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
   const region = extract.groups.region;
   const account = extract.groups.account;
   const baseArn = `arn:aws:iot:${region}:${account}`;
-  const valid = checkTokenValidity(event.protocolData.mqtt.username);
-  if (!valid) {
+  let cachedValue = cache[event.protocolData.mqtt.username];
+  if (!cachedValue) {
+    const valid = await checkTokenValidity(event.protocolData.mqtt.username);
+    cachedValue[event.protocolData.mqtt.username] = {
+      clientId: event.protocolData.mqtt.clientId,
+      expiration: null,
+      valid: !!valid
+    }
+  }
+
+  if (!cachedValue.valid || cachedValue?.expiration > (new Date()).toString()) {
+    cachedValue.valid = false;
     return {
-      isAuthenticated: true, //A Boolean that determines whether client can connect.
+      isAuthenticated: false, //A Boolean that determines whether client can connect.
       principalId: event.protocolData.mqtt.clientId,  //A string that identifies the connection in logs.
     } as IoTAuthorizeResponse;
   }
-
 
   const response = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
