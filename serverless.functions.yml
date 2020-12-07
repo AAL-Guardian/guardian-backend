@@ -15,3 +15,10 @@ functions:
           path: /robot/install
           method: POST
           cors: true
+  synthetizeQuesion:
+    handler: src/apis/synthetize-quesion.default
+    events:
+      - http:
+          path: /synthetize
+          method: POST
+          cors: true

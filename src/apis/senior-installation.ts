@@ -9,7 +9,9 @@ export default async function (event: APIGatewayEvent, context: any) {
   const body = JSON.parse(event.body) as InstallationRequest;
   const robot = body.robotCode;
   const iot = new Iot();
-  const endpoint = await iot.describeEndpoint().promise();
+  const endpoint = await iot.describeEndpoint({
+    endpointType: 'iot:Data-ATS'
+  }).promise();
   const token = await saveSeniorClient();
   const responseBody: InstallationResponse = {
     endpoint: endpoint.endpointAddress,

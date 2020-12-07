@@ -76,6 +76,11 @@ provider:
         - secretsmanager:GetSecretValue
       Resource:
         - arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*
+    - Effect: Allow
+      Action:
+        - polly:*
+      Resource:
+        - "*"
 
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
