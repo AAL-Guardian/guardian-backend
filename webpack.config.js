@@ -1,11 +1,16 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
+const { cpus } = require('os');
 const nodeExternals = require('webpack-node-externals');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,
   devtool: slsw.lib.webpack.isLocal ? 'source-map' : undefined,
+  cache: {
+    type: 'memory'
+  },
   resolve: {
     extensions: [
       '.js',
@@ -31,10 +36,17 @@ module.exports = {
         test: /\.ts(x?)$/,
         use: [
           {
-            loader: 'ts-loader'
+            loader: 'ts-loader',
+            options: {
+              // disable type checker - we will use it in fork plugin
+              transpileOnly: true
+            }
           }
         ],
       }
     ]
-  }
+  },
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ]
 };
