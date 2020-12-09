@@ -17,11 +17,12 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
   let cachedValue = cache[event.protocolData.mqtt.username];
   if (!cachedValue) {
     const valid = await checkTokenValidity(event.protocolData.mqtt.username);
-    cachedValue[event.protocolData.mqtt.username] = {
+    cachedValue = {
       clientId: event.protocolData.mqtt.clientId,
       expiration: null,
       valid: !!valid
     }
+    cache[event.protocolData.mqtt.username] = cachedValue
   }
 
   if (!cachedValue.valid || cachedValue?.expiration > (new Date()).toString()) {

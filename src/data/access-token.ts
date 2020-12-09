@@ -31,7 +31,7 @@ const saveClient = async (scope: string): Promise<string> => {
 }
 
 export async function checkTokenValidity(token: string): Promise<boolean> {
-  const res = await executeStatement("SELECT 1 FROM access_token WHERE valid = 1 AND expire > CURRENT_TIMESTAMP AND token = :token", [
+  const res = await executeStatement("SELECT 1 FROM access_token WHERE valid = 1 AND ifnull(expire, CURRENT_TIMESTAMP) >= CURRENT_TIMESTAMP AND token = :token", [
     {
       name: 'token',
       value: {
@@ -40,5 +40,5 @@ export async function checkTokenValidity(token: string): Promise<boolean> {
     }
   ]);
   console.log('queryRes', res)
-  return res.records.length > 0;
+  return res?.records?.length > 0;
 }
