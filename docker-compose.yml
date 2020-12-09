@@ -1,0 +1,18 @@
+version: "3.7"
+
+volumes:
+  guardian-volume-mysql:
+
+services:
+  mariadb:
+    image: mysql:5.7
+    container_name: guardian-mysql
+    volumes:
+      - guardian-volume-mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=guardian
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=guardian
+    ports:
+      - "3306:3306"
