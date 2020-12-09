@@ -42,6 +42,7 @@ export default async function (event: APIGatewayEvent, context: any) {
       params.Engine = 'standard';
       break;
   }
+
   const presigner = new Polly.Presigner();
   const url = presigner.getSynthesizeSpeechUrl(params);
 
