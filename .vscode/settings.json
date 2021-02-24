@@ -1,0 +1,28 @@
+{
+  "sqltools.connections": [
+    {
+      "askForPassword": false,
+      "database": "doucals_dev",
+      "dialect": "MariaDB",
+      "name": "Wamp",
+      "port": 3306,
+      "server": "localhost",
+      "username": "root",
+      "driver": "MariaDB"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "xprotocol"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "Guardian Doker",
+      "group": "Guardian",
+      "database": "guardian",
+      "username": "admin",
+      "password": "guardian"
+    }
+  ]
+}

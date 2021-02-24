@@ -1,7 +1,5 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
-const { cpus } = require('os');
-const nodeExternals = require('webpack-node-externals');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
@@ -24,11 +22,14 @@ module.exports = {
     path: path.join(__dirname, '.webpack'),
     filename: '[name].js'
   },
-  externals: [nodeExternals({
+  externals: [
+    // not needed anymore? since webpack5 or serverless2.x?
+    // nodeExternals({
     // whitelist: [
     //   'mysql2'
     // ]
-  })],
+    // })
+  ],
   target: 'node',
   module: {
     rules: [

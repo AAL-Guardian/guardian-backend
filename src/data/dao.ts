@@ -1,18 +1,28 @@
-import { RDSDataService } from "aws-sdk";
-import { SqlParametersList } from "aws-sdk/clients/rdsdataservice";
+import { RDSDataClient, ExecuteStatementCommand, SqlParameter } from '@aws-sdk/client-rds-data';
+// import { fromIni } from '@aws-sdk/credential-provider-ini';
+const client = new RDSDataClient({
+  region: 'eu-west-1'
+});
+if(process.env.IS_OFFLINE === 'true') {
+  client.config.credentialDefaultProvider = require('@aws-sdk/credential-provider-ini').fromIni({ profile: process.env.profile})
+}
 
-const rdsDataService = new RDSDataService();
 
-export async function executeStatement(sql: string, parameters?: SqlParametersList) {
+export async function executeStatement(sql: string, parameters?: SqlParameter[]) {
   try {
-    const res = await rdsDataService.executeStatement({
-      resourceArn: process.env.auroraDBArn,
-      secretArn: process.env.secretArn,
-      sql,
-      database: 'guardian',
-      parameters
-    }).promise();
-    return res;
+    // if(process.env.IS_OFFLINE === 'true') {
+    //   return await require('./connected-dao').executeStatement(sql, parameters);
+    // } else {
+      const res = await client.send(new ExecuteStatementCommand({
+        resourceArn: process.env.auroraDBArn,
+        secretArn: process.env.secretArn,
+        sql,
+        database: process.env.auroraSchema,
+        parameters
+      }))
+      return res;
+    // }
+    
   } catch (e) {
     if (e.code === 'BadRequestException') {
       if ((e.message as string).startsWith('Communications link failure')) {
@@ -20,5 +30,6 @@ export async function executeStatement(sql: string, parameters?: SqlParametersLi
         return await executeStatement(sql, parameters);
       }
     }
+    console.log(e);
   }
 }

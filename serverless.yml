@@ -12,32 +12,35 @@ frameworkVersion: ^2.12.0
 configValidationMode: error
 
 custom:
+  serverless-offline:
+    AccountId: { Ref: AWS::AccountId }
   resources:
     Region: { Ref: AWS::Region }
     AccountId: { Ref: AWS::AccountId }
     auroraDB:
-      Name: guardiandb-${self:provider.stage}
+    #   Name: guardiandb-${self:provider.stage}
+      Name: guardian-db
       Arn:
         Fn::Join:
           - ':'
           - - arn:aws:rds
-            - ${self:custom.resources.Region}
-            - ${self:custom.resources.AccountId}
+            - ${self:provider.region}
+            - 278717594002
+            # - ${self:custom.resources.Region}
+            # - ${self:custom.resources.AccountId}
             - cluster:${self:custom.resources.auroraDB.Name}
   webpack:
     includeModules: true   # Node modules configuration for packaging
     packager: 'npm'   # Packager that will be used to package your external modules
   contentEncoding:
     contentCompression: 100 # Minimum body size required for compression in bytes# Targeted usage percentage
-  # dynamodb:
-  #   robotTable: ${self:service}-${self:provider.stage}
-  #   robotTableArn: arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.dynamodb.robotTable}
-  #   start:
-  #     port: 8000
-  #     # inMemory: true
-  #     dbPath: .dynamodata/
-  #     migrate: true
-  #     noStart: false
+  environments:
+    prod:
+      secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:rds-db-credentials/cluster-Y3VSICFR3ZA5XDXBW6TDARMYCY/admin-rmDDNd
+      schema: guardian
+    dev:
+      secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/db_connection-Zo919z
+      schema: guardian_dev
 
 # The `provider` block defines where your service will be deployed
 provider:
@@ -48,6 +51,7 @@ provider:
   memorySize: 1024
   timeout: 30
   profile: ${opt:profile, env:profile, 'default'}
+  lambdaHashingVersion: "20201221"
   apiGateway:
     minimumCompressionSize: 1024
     shouldStartNameWithService: true
@@ -59,36 +63,40 @@ provider:
     Company: Jef
     Project: Guardian
     Environment: ${self:provider.stage}
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - iot:*
-      Resource:
-        - "*"
-    - Effect: Allow
-      Action:
-        - rds:*
-        - rds-data:*
-      Resource:
-        - ${self:custom.resources.auroraDB.Arn}
-    - Effect: Allow
-      Action:
-        - secretsmanager:GetSecretValue
-      Resource:
-        - arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*
-    - Effect: Allow
-      Action:
-        - polly:*
-      Resource:
-        - "*"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - iot:*
+          Resource:
+            - "*"
+        - Effect: Allow
+          Action:
+            - rds:*
+            - rds-data:*
+          Resource:
+            - ${self:custom.resources.auroraDB.Arn}
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*
+            - arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/db_connection-Zo919z
+        - Effect: Allow
+          Action:
+            - polly:*
+          Resource:
+            - "*"
 
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
     stage: ${self:provider.stage}
     version: 0.0.1
+    auroraSchema: ${self:custom.environments.${self:provider.stage}.schema, self:custom.environments.dev.schema}
     auroraDBName: ${self:custom.resources.auroraDB.Name}
     auroraDBArn: ${self:custom.resources.auroraDB.Arn}
-    secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:rds-db-credentials/cluster-6MQOSQ2ONEU2AOH2TBA4W7JIJU/admin-NqZw4j
+    secretArn: ${self:custom.environments.${self:provider.stage}.secretArn, self:custom.environments.dev.secretArn}
 
 package:
   individually: true
@@ -96,7 +104,6 @@ package:
 
 plugins:
   - serverless-webpack
-  # - serverless-dynamodb-local
   - serverless-offline
   
 functions:
@@ -104,17 +111,17 @@ functions:
 
 resources:
   Resources:
-    auroraDB: 
-      Type: AWS::RDS::DBCluster
-      Properties:
-        DBClusterIdentifier: ${self:custom.resources.auroraDB.Name}
-        MasterUsername: ${env:masterDBAdmin}
-        MasterUserPassword: ${env:masterDBPassword}
-        Engine: aurora-mysql
-        EngineMode: serverless
-        EnableHttpEndpoint: true
-        ScalingConfiguration:
-          AutoPause: true
-          MaxCapacity: 4
-          MinCapacity: 1
-          SecondsUntilAutoPause: 600
+    # auroraDB: 
+    #   Type: AWS::RDS::DBCluster
+    #   Properties:
+    #     DBClusterIdentifier: ${self:service}-${self:provider.stage}-db
+    #     MasterUsername: ${env:masterDBAdmin}
+    #     MasterUserPassword: ${env:masterDBPassword}
+    #     Engine: aurora-mysql
+    #     EngineMode: serverless
+    #     EnableHttpEndpoint: true
+    #     ScalingConfiguration:
+    #       AutoPause: true
+    #       MaxCapacity: 4
+    #       MinCapacity: 1
+    #       SecondsUntilAutoPause: 600

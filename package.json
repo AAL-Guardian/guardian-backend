@@ -17,27 +17,28 @@
   },
   "homepage": "https://github.com/AAL-Guardian/guardian-backend#readme",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.64",
-    "@types/mysql": "^2.15.16",
-    "@types/node": "^12.19.6",
+    "@aws-sdk/credential-provider-ini": "^3.6.1",
+    "@types/aws-lambda": "^8.10.72",
+    "@types/mysql": "^2.15.17",
+    "@types/node": "^14.0.0",
     "@types/uuid": "^8.3.0",
-    "aws-sdk": "^2.798.0",
-    "fork-ts-checker-webpack-plugin": "^6.0.5",
-    "serverless": "^2.12.0",
-    "serverless-dotenv-plugin": "^3.1.0",
+    "fork-ts-checker-webpack-plugin": "^6.1.0",
+    "mysql": "^2.18.1",
+    "serverless": "^2.25.2",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
     "serverless-webpack": "^5.3.5",
-    "thread-loader": "^3.0.1",
-    "ts-loader": "^8.0.11",
-    "typescript": "^4.1.2",
-    "webpack": "^5.8.0",
-    "webpack-cli": "^4.2.0",
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.1.5",
+    "webpack": "^5.24.0",
+    "webpack-cli": "^4.5.0",
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "knex": "^0.21.12",
-    "mysql": "^2.18.1",
-    "uuid": "^8.3.1"
+    "@aws-sdk/client-iot": "^3.6.1",
+    "@aws-sdk/client-polly": "^3.6.1",
+    "@aws-sdk/client-rds-data": "^3.6.1",
+    "@aws-sdk/polly-request-presigner": "^3.6.1",
+    "uuid": "^8.3.2"
   }
 }

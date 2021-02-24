@@ -8,22 +8,24 @@ const cache: {
   }
 } = {}
 export default async function (event: IoTAuthorizerEvent, context: any) {
+  console.log('Input');
+  console.log(event);
   const extract = /arn:aws:lambda:(?<region>[a-z0-9\-]+):(?<account>[0-9]+):/.exec(context.invokedFunctionArn);
   // const region = 'eu-west-1';
   // const account = '517697470599';
   const region = extract.groups.region;
   const account = extract.groups.account;
   const baseArn = `arn:aws:iot:${region}:${account}`;
-  let cachedValue = cache[event.protocolData.mqtt.username];
-  if (!cachedValue) {
+  // let cachedValue = cache[event.protocolData.mqtt.username];
+  // if (!cachedValue) {
     const valid = await checkTokenValidity(event.protocolData.mqtt.username);
-    cachedValue = {
+    const cachedValue = {
       clientId: event.protocolData.mqtt.clientId,
       expiration: null,
       valid: !!valid
     }
-    cache[event.protocolData.mqtt.username] = cachedValue
-  }
+  //   cache[event.protocolData.mqtt.username] = cachedValue
+  // }
 
   if (!cachedValue.valid || cachedValue?.expiration > (new Date()).toString()) {
     cachedValue.valid = false;
@@ -81,11 +83,11 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
             ]
           }
         ]
-
       }
     ]
-
   } as IoTAuthorizeResponse;
+  console.log('Output');
+  console.log(response);
   return response;
 }
 

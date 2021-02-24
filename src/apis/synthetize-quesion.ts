@@ -1,7 +1,9 @@
+import { PollyClient, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
+import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { Polly } from "aws-sdk";
-import { SynthesizeSpeechInput } from "aws-sdk/clients/polly";
 import { getResponse } from "../common/response.template";
+
+const pollyClient = new PollyClient({})
 
 export default async function (event: APIGatewayEvent, context: any) {
   const response = getResponse() as APIGatewayProxyResult;
@@ -42,9 +44,10 @@ export default async function (event: APIGatewayEvent, context: any) {
       params.Engine = 'standard';
       break;
   }
-
-  const presigner = new Polly.Presigner();
-  const url = presigner.getSynthesizeSpeechUrl(params);
+  const url = await getSynthesizeSpeechUrl({
+    client: pollyClient,
+    params
+  });
 
   response.body = JSON.stringify({ url });
   return response;
