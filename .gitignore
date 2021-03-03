@@ -104,3 +104,6 @@ dist
 .tern-port
 
 .webpack
+
+.s3-local/*
+!.s3-local/.gitkeep

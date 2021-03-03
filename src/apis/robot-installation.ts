@@ -4,6 +4,7 @@ import {
   CreateThingCommand, CreateThingCommandOutput, DescribeEndpointCommand, DescribeThingCommand, CreatePolicyResponse, GetPolicyCommand,
 } from '@aws-sdk/client-iot';
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import logEvent from '../data/log-event';
 import { getResponse } from "../common/response.template";
 import { saveRobotClient } from "../data/access-token";
 import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
@@ -20,6 +21,9 @@ export default async function (event: APIGatewayEvent) {
   const body = JSON.parse(event.body) as InstallationRequest;
 
   const robot = body.robotCode;
+
+  await logEvent(robot, 'robot_install_requested');
+
   const token = await saveRobotClient(robot);
 
   const endpoint = await iot.send(new DescribeEndpointCommand({ endpointType: 'iot:Data-ATS' }));
