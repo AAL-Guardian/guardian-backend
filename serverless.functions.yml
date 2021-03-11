@@ -10,6 +10,10 @@ functions:
           cors: true
   installRobot:
     handler: src/apis/robot-installation.default
+    environment:
+      RANDFILE: /tmp/.random
+    layers:
+      - arn:aws:lambda:eu-west-1:278717594002:layer:openssl-lambda:1
     events:
       - http:
           path: /robot/install
@@ -27,6 +31,20 @@ functions:
     events:
       - http:
           path: /upload-url/audio/{robotCode}
+          method: GET
+          cors: true
+  getReportList:
+    handler: src/apis/list-report-types.default
+    events:
+      - http:
+          path: /report/list
+          method: GET
+          cors: true
+  getReportSetup:
+    handler: src/apis/get-report-setup.default
+    events:
+      - http:
+          path: /report/{id}
           method: GET
           cors: true
   recheckEvents:

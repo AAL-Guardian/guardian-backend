@@ -5,7 +5,7 @@ export interface InstallationRequest {
 
 export interface InstallationResponse {
   clientId: string,
-  token: string,
+  token?: string,
   endpoint: string,
   robotCode: string,
   robotTopic: string

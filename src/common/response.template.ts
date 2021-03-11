@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult, APIGatewayProxyResultV2 } from "aws-lambda";
+import { APIGatewayProxyResult, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 
 const template = {
   statusCode: 200,
@@ -9,5 +9,5 @@ const template = {
   body: undefined
 };
 
-export const getResponseV2 = () =>  ( { ...template } as APIGatewayProxyResultV2 );
+export const getResponseV2 = () =>  ( { ...template } as APIGatewayProxyStructuredResultV2 );
 export const getResponse = () =>  ( { ...template } as APIGatewayProxyResult );

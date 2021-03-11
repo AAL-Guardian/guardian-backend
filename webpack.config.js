@@ -44,10 +44,22 @@ module.exports = {
             }
           }
         ],
-      }
+      },
+      {
+        test: /\.pem$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name].[ext]'
+            }
+          },
+        ],
+      },
     ]
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin()
+    new ForkTsCheckerWebpackPlugin(),
+     
   ]
 };

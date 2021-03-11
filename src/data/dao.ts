@@ -1,14 +1,15 @@
 import { RDSDataClient, ExecuteStatementCommand, SqlParameter } from '@aws-sdk/client-rds-data';
 // import { fromIni } from '@aws-sdk/credential-provider-ini';
+
 const client = new RDSDataClient({
   region: 'eu-west-1'
 });
+
 if(process.env.IS_OFFLINE === 'true') {
   client.config.credentialDefaultProvider = require('@aws-sdk/credential-provider-ini').fromIni({ profile: process.env.profile})
 }
 
-
-export async function executeStatement(sql: string, parameters?: SqlParameter[]) {
+export async function executeStatement(sql: string, parameters?: SqlParameter[], mapResults = true) {
   try {
     // if(process.env.IS_OFFLINE === 'true') {
     //   return await require('./connected-dao').executeStatement(sql, parameters);
@@ -18,9 +19,22 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[])
         secretArn: process.env.secretArn,
         sql,
         database: process.env.auroraSchema,
-        parameters
-      }))
-      return res;
+        parameters,
+        includeResultMetadata: true,        
+      }));
+
+      if(mapResults) {
+        let mapped = res.records?.map(one => {
+          const obj = {} as { [key: string]: any };
+          res.columnMetadata.forEach((meta, i) => obj[meta.name] = Object.values(one[i])[0]);
+          return obj;
+        })
+        return mapped;
+      } else {
+        return res;
+      }
+
+      
     // }
     
   } catch (e) {

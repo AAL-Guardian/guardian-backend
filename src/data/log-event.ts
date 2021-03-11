@@ -23,6 +23,6 @@ export default async function logEvent(robotCode: string, eventName: string = ""
         stringValue: eventData
       }
     }
-  ]);
+  ], false);
   console.log('insertRes', res);
 }

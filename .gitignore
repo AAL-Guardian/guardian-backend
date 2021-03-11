@@ -107,3 +107,5 @@ dist
 
 .s3-local/*
 !.s3-local/.gitkeep
+
+tmp

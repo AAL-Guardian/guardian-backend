@@ -8,6 +8,9 @@ import logEvent from '../data/log-event';
 import { getResponse } from "../common/response.template";
 import { saveRobotClient } from "../data/access-token";
 import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
+import { promises } from 'fs';
+import shellExec = require('shell-exec');
+require('./../AmazonRootCA1.pem');
 
 const iot = new IoTClient({
   region: 'eu-west-1'
@@ -24,7 +27,7 @@ export default async function (event: APIGatewayEvent) {
 
   await logEvent(robot, 'robot_install_requested');
 
-  const token = await saveRobotClient(robot);
+  // const token = await saveRobotClient(robot);
 
   const endpoint = await iot.send(new DescribeEndpointCommand({ endpointType: 'iot:Data-ATS' }));
   let thing: DescribeThingCommandOutput | CreateThingCommandOutput,
@@ -108,24 +111,31 @@ export default async function (event: APIGatewayEvent) {
     target: cert.certificateArn
   }))
 
+  await promises.writeFile(`/tmp/${thing.thingName}.pem`, cert.certificatePem);
+  await promises.writeFile(`/tmp/${thing.thingName}.key`, cert.keyPair.PrivateKey);
+
+  console.log(await shellExec("openssl version"));
+  await shellExec("export RANDFILE=/tmp/.random");
+  const command = `openssl pkcs12 -export -in /tmp/${thing.thingName}.pem -inkey /tmp/${thing.thingName}.key -out /tmp/${thing.thingName}.pfx -passout pass: -certfile ${__dirname}/../AmazonRootCA1.pem`;
+  await shellExec(command);
   const responseBody = {
-    token,
+    // token,
     clientId: thing.thingName,
     endpoint: endpoint.endpointAddress,
     robotCode: robot,
     robotTopic: thing.thingName,
     websocket: {
       path: '/mqtt?x-amz-customauthorizer-name=GuardianAuthorizer',
-      username: token
+      // username: token
     },
     certificate: {
       certificateId: cert.certificateId,
       certificatePem: cert.certificatePem,
-      keyPair: cert.keyPair
+      keyPair: cert.keyPair,
+      pfx: (await promises.readFile(`/tmp/${thing.thingName}.pfx`)).toString()
     }
   } as InstallationResponse;
 
-  console.log('robotResponse', responseBody);
   response.body = JSON.stringify(responseBody);
 
   return response;
