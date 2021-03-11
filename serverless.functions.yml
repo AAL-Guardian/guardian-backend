@@ -10,8 +10,6 @@ functions:
           cors: true
   installRobot:
     handler: src/apis/robot-installation.default
-    environment:
-      RANDFILE: /tmp/.random
     layers:
       - arn:aws:lambda:eu-west-1:278717594002:layer:openssl-lambda:1
     events:
