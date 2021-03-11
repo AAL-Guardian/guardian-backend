@@ -118,7 +118,7 @@ provider:
     auroraDBArn: ${self:custom.resources.auroraDB.Arn}
     secretArn: ${self:custom.environments.${self:provider.stage}.secretArn, self:custom.environments.dev.secretArn}
     bucketName: ${self:custom.resources.audioBucket}
-    RANDFILE: /tmp/.random
+    dynamodbScheduler: ${self:service}-${self:provider.stage}-scheduler
 
 package:
   individually: true
@@ -162,10 +162,10 @@ resources:
         AttributeDefinitions:
           -
             AttributeName: clientId
-            AttributeType: N
+            AttributeType: S
           -
             AttributeName: eventId
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           -
             AttributeName: clientId
