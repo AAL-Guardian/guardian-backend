@@ -175,17 +175,3 @@ resources:
             KeyType: RANGE
         StreamSpecification:
           StreamViewType: OLD_IMAGE 
-    # auroraDB: 
-    #   Type: AWS::RDS::DBCluster
-    #   Properties:
-    #     DBClusterIdentifier: ${self:service}-${self:provider.stage}-db
-    #     MasterUsername: ${env:masterDBAdmin}
-    #     MasterUserPassword: ${env:masterDBPassword}
-    #     Engine: aurora-mysql
-    #     EngineMode: serverless
-    #     EnableHttpEndpoint: true
-    #     ScalingConfiguration:
-    #       AutoPause: true
-    #       MaxCapacity: 4
-    #       MinCapacity: 1
-    #       SecondsUntilAutoPause: 600

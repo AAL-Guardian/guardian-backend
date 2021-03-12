@@ -4,9 +4,9 @@ export default async function logEvent(robotCode: string, eventName: string = ""
   if (typeof eventData != 'string') {
     eventData = JSON.stringify(eventData);
   }
-  const res = await executeStatement("INSERT INTO guardian_event (robot_code, event_name, event_data, timestamp) values (:robot_code, :event_name, :event_data, current_timestamp)", [
+  const res = await executeStatement("INSERT INTO guardian_event (robot_serial_number, event_name, event_data, timestamp) values (:robot_serial_number, :event_name, :event_data, current_timestamp)", [
     {
-      name: 'robot_code',
+      name: 'robot_serial_number',
       value: {
         stringValue: robotCode
       }

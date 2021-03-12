@@ -8,9 +8,9 @@ export default async function (event: DynamoDBStreamEvent) {
 
     if (eventName === 'REMOVE') {
       console.log('REMOVE');
-      console.log(record)
-    }
-    else {
+      console.log(dynamodbRecord);
+      
+    } else {
       console.log("Event is " + eventName + ", Skipping execution");
     }
   }));

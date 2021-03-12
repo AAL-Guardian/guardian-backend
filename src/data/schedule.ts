@@ -16,11 +16,16 @@ export async function getScheduleById(id: string) {
 export async function getReportRequestById(id: string): Promise<ReportRequest> {
   const res = await executeStatement("SELECT * FROM report_request WHERE id = :id", [
     {
-      name: 'scope',
+      name: 'id',
       value: {
         stringValue: id
       }
     }
   ])
   return res[0];
+}
+
+export async function listFutureReportRequests(): Promise<ReportRequest[]> {
+  const res = await executeStatement("SELECT * FROM report_request WHERE date_scheduled > current_timestamp");
+  return res;
 }

@@ -3,7 +3,6 @@ import { RDSDataClient, ExecuteStatementCommand, SqlParameter } from '@aws-sdk/c
 
 const client = new RDSDataClient({
   region: 'eu-west-1'
-
 });
 
 if (process.env.IS_OFFLINE === 'true') {
@@ -29,7 +28,14 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
     if (mapResults) {
       let mapped = res.records?.map(one => {
         const obj = {} as { [key: string]: any };
-        res.columnMetadata.forEach((meta, i) => obj[meta.name] = Object.values(one[i])[0]);
+        res.columnMetadata.forEach((meta, i) => {
+          if(one[i].isNull) {
+            obj[meta.name] = null;  
+          } else {
+            obj[meta.name] = Object.values(one[i])[0]
+          }
+          
+        });
         return obj;
       })
       return mapped;
@@ -45,5 +51,6 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
       }
     }
     console.log(e);
+    throw e;
   }
 }

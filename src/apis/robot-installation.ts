@@ -1,15 +1,17 @@
 import {
-  AddThingToThingGroupCommand, AttachPolicyCommand, DescribeThingCommandOutput, IoTClient,
+  AddThingToThingGroupCommand, AttachPolicyCommand,
   AttachThingPrincipalCommand, CreateKeysAndCertificateCommand, CreatePolicyCommand,
-  CreateThingCommand, CreateThingCommandOutput, DescribeEndpointCommand, DescribeThingCommand, CreatePolicyResponse, GetPolicyCommand,
+  CreatePolicyResponse, CreateThingCommand, CreateThingCommandOutput, DescribeEndpointCommand, DescribeThingCommand, DescribeThingCommandOutput,
+
+  GetPolicyCommand, IoTClient
 } from '@aws-sdk/client-iot';
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import logEvent from '../data/log-event';
-import { getResponse } from "../common/response.template";
-import { saveRobotClient } from "../data/access-token";
-import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
 import { promises } from 'fs';
+import { getResponse } from "../common/response.template";
+import logEvent from '../data/log-event';
+import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
 import shellExec = require('shell-exec');
+import { getRobotBySN, insertRobot } from '../data/robot';
 require('./../AmazonRootCA1.pem');
 
 const iot = new IoTClient({
@@ -27,7 +29,7 @@ export default async function (event: APIGatewayEvent) {
 
   await logEvent(robot, 'robot_install_requested');
 
-  // const token = await saveRobotClient(robot);
+  const robotObject = await getRobotBySN(robot);
 
   const endpoint = await iot.send(new DescribeEndpointCommand({ endpointType: 'iot:Data-ATS' }));
   let thing: DescribeThingCommandOutput | CreateThingCommandOutput,
@@ -136,6 +138,9 @@ export default async function (event: APIGatewayEvent) {
     }
   } as InstallationResponse;
 
+  if(!robotObject) {
+    await insertRobot(robot, thing.thingName, thing.thingName, undefined, true);
+  }
   response.body = JSON.stringify(responseBody);
 
   return response;
