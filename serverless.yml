@@ -109,6 +109,11 @@ provider:
           Resource:
             - "${self:custom.resources.schedulerTableArn}"
             - "${self:custom.resources.schedulerTableArn}/index/*"
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource:
+            - "*"
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
     stage: ${self:provider.stage}

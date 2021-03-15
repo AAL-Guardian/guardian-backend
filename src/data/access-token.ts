@@ -1,22 +1,20 @@
 import { v4 } from "uuid";
 import { executeStatement } from "./dao";
 
-export const saveRobotClient = (robotCode: string) => saveClient('RobotClient', robotCode);
-export const saveSeniorClient = (robotCode: string) => saveClient('SeniorAppClient', robotCode);
-
-const saveClient = async (scope: string, robotCode: string): Promise<string> => {
+export const saveSeniorClient = async (assignment_id: number): Promise<string> => {
   const token = v4();
-  const res = await executeStatement("INSERT INTO access_token (scope, robot_code, token, valid) values (:scope, :robotCode, :token, :valid)", [
+  const scope = 'SeniorApp';
+  const res = await executeStatement("INSERT INTO access_token (robot_assignment_id, scope, token, valid) values (:robot_assignment_id, :scope, :token, :valid)", [
     {
-      name: 'scope',
+      name: 'robot_assignment_id',
       value: {
         stringValue: scope
       }
     },
     {
-      name: 'robotCode',
+      name: 'scope',
       value: {
-        stringValue: robotCode
+        stringValue: scope
       }
     },
     {

@@ -61,6 +61,7 @@ functions:
           cors: true
   elaborateUpload:
     handler: src/event-handlers/elaborate-raw-upload.default
+    timeout: 900
     events:
       - s3:
           bucket: ${self:custom.resources.audioBucket}
@@ -68,6 +69,15 @@ functions:
           existing: true
           rules:
             - suffix: .base64
+  # audioSignalReaction:
+  #   handler: src/event-handlers/audio-signal-reaction.default
+  #   events:
+  #     - s3:
+  #         bucket: ${self:custom.resources.audioBucket}
+  #         event: s3:ObjectCreated:*
+  #         existing: true
+  #         rules:
+  #           - suffix: .base64
   elaborateSchedulerEvent:
     handler: src/event-handlers/scheduler-event-changed.default
     events:

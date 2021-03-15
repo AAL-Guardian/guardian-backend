@@ -1,4 +1,4 @@
-import { Field } from "@aws-sdk/client-rds-data";
+import { Field, Value } from "@aws-sdk/client-rds-data";
 import { executeStatement } from "./dao";
 import { Robot } from "./models/robot.model";
 
@@ -55,4 +55,22 @@ export async function getRobotByClientId(robotId: string) {
 
 export async function getClientByRobotSN(serial_number: string) {
 
+}
+
+export async function getRobotAssignment(robot_serial_number: string, client_id: string) {
+  const assignment = executeStatement(`SELECT * FROM robot_assignment WHERE robot_serial_number = :serial_number AND clients_id = :client_id`, [
+    {
+      name: 'serial_number',
+      value: {
+        stringValue: robot_serial_number
+      }
+    },
+    {
+      name: 'client_id',
+      value: {
+        stringValue: client_id
+      }
+    }
+  ]);
+  return assignment[0];
 }
