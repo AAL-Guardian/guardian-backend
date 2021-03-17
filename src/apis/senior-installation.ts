@@ -20,7 +20,7 @@ export default async function (event: APIGatewayEvent, context: any) {
     getRobotBySN(robotCode)
   ]);
 
-  if(!assignment) {
+  if (!assignment) {
     const assignmentId = await assignRobot(robot.serial_number, clientId);
     assignment = await getRobotAssignmentById(assignmentId);
   }
@@ -33,7 +33,7 @@ export default async function (event: APIGatewayEvent, context: any) {
 
   const responseBody: InstallationResponse = {
     endpoint: endpoint.endpointAddress,
-    clientId: body.clientId,
+    clientId: 'senior-' + body.clientId,
     robotTopic: 'misty-' + robot.topic,
     token
   };
