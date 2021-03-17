@@ -1,0 +1,22 @@
+functions:
+  queryTest:
+    handler: src/apis/tests/query-test.default
+    events:
+      - http:
+          path: /test/query
+          method: POST
+          cors: true
+  synthetizeQuesion:
+    handler: src/apis/tests/synthetize-quesion.default
+    events:
+      - http:
+          path: /test/synthetize
+          method: POST
+          cors: true
+  sendReportRequest:
+    handler: src/apis/tests/send-report-request.default
+    events:
+      - http:
+          path: /test/report-request/{requestId}
+          method: GET
+          cors: true

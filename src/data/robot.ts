@@ -1,9 +1,14 @@
-import { Field, Value } from "@aws-sdk/client-rds-data";
-import { executeStatement } from "./dao";
+import { Field } from "@aws-sdk/client-rds-data";
+import { DATE_FORMAT, executeStatement, insertStatement, selectStatement, updateStatement } from "./dao";
 import { Robot } from "./models/robot.model";
+import dayjs = require("dayjs");
+import { Client } from "./models/client.model";
+import { Assignment } from "./models/assignment.model";
+import { throws } from "node:assert";
 
 export async function getRobotBySN(serial_number: string): Promise<Robot | undefined> {
-  const all = executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
+  // const all = await executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
+  const all = await selectStatement("robot", [{
     name: 'serial_number',
     value: {
       stringValue: serial_number
@@ -12,8 +17,8 @@ export async function getRobotBySN(serial_number: string): Promise<Robot | undef
   return all[0];
 }
 
-export async function insertRobot(serial_number: string, thing_name: string, topic: string, extra = null, active = true): Promise<boolean> {
-  await executeStatement("INSERT INTO robot (serial_number, thing_name, topic, extra, active) VALUES (:serial_number, :thing_name, :topic, :extra, :active)", [
+export async function insertRobot(serial_number: string, thing_name: string, topic: string, extra = null, is_active = true): Promise<boolean> {
+  await executeStatement("INSERT INTO robot (serial_number, thing_name, topic, extra, is_active) VALUES (:serial_number, :thing_name, :topic, :extra, :is_active)", [
     {
       name: 'serial_number',
       value: {
@@ -40,37 +45,144 @@ export async function insertRobot(serial_number: string, thing_name: string, top
       } as Field
     },
     {
-      name: 'active',
+      name: 'is_active',
       value: {
-        booleanValue: active
+        booleanValue: is_active
       }
     }
   ])
   return true;
 }
 
-export async function getRobotByClientId(robotId: string) {
-  const robot = executeStatement(`SELECT * FROM`)
-}
-
-export async function getClientByRobotSN(serial_number: string) {
-
-}
-
-export async function getRobotAssignment(robot_serial_number: string, client_id: string) {
-  const assignment = executeStatement(`SELECT * FROM robot_assignment WHERE robot_serial_number = :serial_number AND clients_id = :client_id`, [
+export async function getClientByRobotSN(serial_number: string): Promise<Client> {
+  const clients = await executeStatement(`SELECT c.* FROM clients c
+  JOIN robot_assignment ra on c.id = ra.clients_id
+  WHERE ra.robot_serial_number = :serial_number
+  AND ra.is_active = true
+  AND current_timestamp BETWEEN ra.start_date AND IFNULL(ra.end_date, current_timestamp)`, [
     {
       name: 'serial_number',
       value: {
-        stringValue: robot_serial_number
+        stringValue: serial_number
       }
+    }
+  ]);
+  return clients[0];
+}
+
+export async function assignRobot(serial_number: string, client_id: string, date_end?: string) {
+  const currentAssignment = await getRobotAssignment(serial_number);
+  if (currentAssignment) {
+    if (client_id === currentAssignment.clients_id && date_end === currentAssignment.end_date) {
+      return currentAssignment.id;
+    }
+    if (client_id === currentAssignment.clients_id && date_end !== currentAssignment.end_date) {
+      //update
+      return currentAssignment.id;
+    }
+    closeAssignment(currentAssignment.id);
+    //close current assignment
+  }
+  const assignmentId = await createNewAssignment(serial_number, client_id, null, date_end);
+  return assignmentId;
+}
+
+async function createNewAssignment(serial_number: string, clients_id: string, start_date: string | null, end_date: string | null): Promise<number> {
+  const res = await insertStatement("robot_assignment", [
+    {
+      name: 'robot_serial_number',
+      value: {
+        stringValue: serial_number
+      }
+    },
+    {
+      name: 'clients_id',
+      value: {
+        stringValue: clients_id ?? undefined,
+        isNull: !clients_id ? true : undefined
+      } as Field
+    },
+    {
+      name: 'start_date',
+      value: {
+        stringValue: start_date ?? dayjs().format(DATE_FORMAT)
+      }
+    },
+    {
+      name: 'end_date',
+      value: {
+        stringValue: end_date ?? '2099-12-31 23:59',
+        // isNull: !end_date ? true : undefined // not nullable filed
+      } as Field
+    },
+  ]);
+  return res[0];
+}
+
+async function closeAssignment(id: number) {
+  // await executeStatement(`UPDATE robot_assignment SET is_active = false, end_date = current_date WHERE id = :id`, [
+  await updateStatement("robot_assignment", [
+    {
+      name: 'is_active',
+      value: {
+        booleanValue: false
+      }
+    },
+    {
+      name: 'end_date',
+      value: {
+        stringValue: dayjs().format(DATE_FORMAT)
+      }
+    },
+
+  ],
+    [
+      {
+        name: 'id',
+        value: {
+          longValue: id
+        }
+      }
+    ],
+  );
+  return true;
+}
+
+export async function getRobotAssignment(robot_serial_number?: string, client_id?: string): Promise<Assignment> {
+  if(!robot_serial_number && !client_id) {
+    throw new Error('You must specify at lest one of robot_serial_number, client_id');
+  }
+  const assignment = await executeStatement(`
+  SELECT *
+  FROM robot_assignment
+  WHERE robot_serial_number = ifnull(:serial_number, robot_serial_number)
+    AND clients_id = ifnull(:client_id, clients_id)
+    AND is_active = true
+    AND current_timestamp BETWEEN start_date AND IFNULL(end_date, current_timestamp)`, [
+    {
+      name: 'serial_number',
+      value: {
+        stringValue: robot_serial_number ?? undefined,
+        isNull: !robot_serial_number ? true : undefined
+      } as Field
     },
     {
       name: 'client_id',
       value: {
-        stringValue: client_id
-      }
+        stringValue: client_id ?? undefined,
+        isNull: !client_id ? true : undefined
+      } as Field
     }
   ]);
   return assignment[0];
+}
+
+export async function getRobotAssignmentById(assignmentId: number): Promise<Assignment> {
+  const list = await selectStatement('robot_assignment', [{
+    name: 'id',
+    value: {
+      longValue: assignmentId
+    }
+  }]);
+  return list[0]
 }

@@ -1,14 +1,15 @@
 import { v4 } from "uuid";
-import { executeStatement } from "./dao";
+import { executeStatement, insertStatement } from "./dao";
+import { AccessToken } from "./models/access-token.model";
 
 export const saveSeniorClient = async (assignment_id: number): Promise<string> => {
   const token = v4();
   const scope = 'SeniorApp';
-  const res = await executeStatement("INSERT INTO access_token (robot_assignment_id, scope, token, valid) values (:robot_assignment_id, :scope, :token, :valid)", [
+  await insertStatement("access_token", [
     {
       name: 'robot_assignment_id',
       value: {
-        stringValue: scope
+        longValue: assignment_id
       }
     },
     {
@@ -24,26 +25,25 @@ export const saveSeniorClient = async (assignment_id: number): Promise<string> =
       }
     },
     {
-      name: 'valid',
+      name: 'is_valid',
       value: {
-        longValue: 1
+        booleanValue: true
       }
     },
   ]);
-  console.log('insertRes', res);
   return token;
 }
 
-export async function checkTokenValidity(token: string): Promise<boolean> {
-  const res = await executeStatement("SELECT 1 FROM access_token WHERE valid = 1 AND ifnull(expire, CURRENT_TIMESTAMP) >= CURRENT_TIMESTAMP AND token = :token", [
+export async function checkTokenValidity(token: string): Promise<AccessToken> {
+  const res = await executeStatement("SELECT * FROM access_token WHERE is_valid = true AND ifnull(expire, CURRENT_TIMESTAMP) >= CURRENT_TIMESTAMP AND token = :token", [
     {
       name: 'token',
       value: {
         stringValue: token
       }
     }
-  ]);
+  ]) as any[];
   console.log('Token Validity Query');
-  console.log(res.records);
-  return res?.records?.length > 0;
+  console.log(res);
+  return res[0];
 }

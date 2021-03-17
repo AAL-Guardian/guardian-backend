@@ -2,7 +2,6 @@ import {
   AddThingToThingGroupCommand, AttachPolicyCommand,
   AttachThingPrincipalCommand, CreateKeysAndCertificateCommand, CreatePolicyCommand,
   CreatePolicyResponse, CreateThingCommand, CreateThingCommandOutput, DescribeEndpointCommand, DescribeThingCommand, DescribeThingCommandOutput,
-
   GetPolicyCommand, IoTClient
 } from '@aws-sdk/client-iot';
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";

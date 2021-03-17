@@ -1,9 +1,9 @@
+import { DescribeEndpointCommand, IoTClient } from '@aws-sdk/client-iot';
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { IoTClient, DescribeEndpointCommand } from '@aws-sdk/client-iot';
 import { getResponse } from "../common/response.template";
 import { saveSeniorClient } from "../data/access-token";
 import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
-import { getRobotAssignment, getRobotBySN } from "../data/robot";
+import { assignRobot, getRobotAssignment, getRobotAssignmentById, getRobotBySN } from "../data/robot";
 
 const iot = new IoTClient({
   region: 'eu-west-1'
@@ -15,11 +15,16 @@ export default async function (event: APIGatewayEvent, context: any) {
   const robotCode = body.robotCode;
   const clientId = body.clientId;
 
-  const [assignment, robot] = await Promise.all([
+  let [assignment, robot] = await Promise.all([
     getRobotAssignment(robotCode, clientId),
     getRobotBySN(robotCode)
   ]);
-  
+
+  if(!assignment) {
+    const assignmentId = await assignRobot(robot.serial_number, clientId);
+    assignment = await getRobotAssignmentById(assignmentId);
+  }
+
   const token = await saveSeniorClient(assignment.id);
 
   const endpoint = await iot.send(new DescribeEndpointCommand({

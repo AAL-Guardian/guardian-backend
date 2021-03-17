@@ -1,4 +1,5 @@
 import { Dayjs } from "dayjs";
+import { ReportQuestion } from "./report-question.model";
 
 export interface ReportRequest {
   id: string,
@@ -14,4 +15,6 @@ export interface ReportRequest {
   date_updated: string | Date | Dayjs,
   date_deleted?: string,
   time?: number
+
+  report_question: ReportQuestion[];
 }

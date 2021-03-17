@@ -17,13 +17,6 @@ functions:
           path: /robot/install
           method: POST
           cors: true
-  synthetizeQuesion:
-    handler: src/apis/synthetize-quesion.default
-    events:
-      - http:
-          path: /synthetize
-          method: POST
-          cors: true
   getAudioUploadUrl:
     handler: src/apis/get-audio-upload-url.default
     events:
@@ -85,11 +78,3 @@ functions:
           type: dynamodb
           arn:
             Fn::GetAtt: [schedulerTable, StreamArn]
-
-  queryTest:
-    handler: src/apis/query-test.default
-    events:
-      - http:
-          path: /query-test
-          method: POST
-          cors: true

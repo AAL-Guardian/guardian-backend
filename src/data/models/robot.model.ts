@@ -3,6 +3,6 @@ export interface Robot {
   thing_name: string;
   topic: string;
   extra?: string;
-  active: boolean;
+  is_active: boolean;
   creation_date: string;
 }

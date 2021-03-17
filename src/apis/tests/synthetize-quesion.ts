@@ -1,7 +1,7 @@
 import { PollyClient, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
 import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getResponse } from "../common/response.template";
+import { getResponse } from "../../common/response.template";
 
 const pollyClient = new PollyClient({})
 

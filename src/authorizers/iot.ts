@@ -1,12 +1,6 @@
 import { checkTokenValidity } from "../data/access-token";
 
-const cache: {
-  [key: string]: {
-    clientId: string,
-    expiration: string,
-    valid: boolean
-  }
-} = {}
+
 export default async function (event: IoTAuthorizerEvent, context: any) {
   console.log('Input');
   console.log(event);
@@ -16,28 +10,11 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
   const region = extract.groups.region;
   const account = extract.groups.account;
   const baseArn = `arn:aws:iot:${region}:${account}`;
-  // let cachedValue = cache[event.protocolData.mqtt.username];
-  // if (!cachedValue) {
-    const valid = await checkTokenValidity(event.protocolData.mqtt.username);
-    const cachedValue = {
-      clientId: event.protocolData.mqtt.clientId,
-      expiration: null,
-      valid: !!valid
-    }
-  //   cache[event.protocolData.mqtt.username] = cachedValue
-  // }
 
-  if (!cachedValue.valid || cachedValue?.expiration > (new Date()).toString()) {
-    cachedValue.valid = false;
-    return {
-      isAuthenticated: false, //A Boolean that determines whether client can connect.
-      principalId: event.protocolData.mqtt.clientId,  //A string that identifies the connection in logs.
-    } as IoTAuthorizeResponse;
-  }
-
+  const token = await checkTokenValidity(event.protocolData.mqtt.username);
   const response = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
-    principalId: event.protocolData.mqtt.clientId,  //A string that identifies the connection in logs.
+    principalId: token.id.toFixed(),  //A string that identifies the connection in logs.
     disconnectAfterInSeconds: 86400,
     refreshAfterInSeconds: 300,
     policyDocuments: [

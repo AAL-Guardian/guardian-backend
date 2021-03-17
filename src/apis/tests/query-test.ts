@@ -1,6 +1,6 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getResponse } from "../common/response.template";
-import { executeStatement } from "../data/dao";
+import { getResponse } from "../../common/response.template";
+import { executeStatement } from "../../data/dao";
 
 export default async function (event: APIGatewayEvent) {
   const response = getResponse() as APIGatewayProxyResult;

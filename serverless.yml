@@ -135,7 +135,8 @@ plugins:
   - serverless-offline
   
 functions:
-  ${file(./serverless.functions.yml):functions}
+  - ${file(./serverless.functions.yml):functions}
+  - ${file(./serverless.test-functions.yml):functions}
 
 resources:
   Resources:
