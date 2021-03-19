@@ -1,0 +1,48 @@
+functions:
+  iotTokenAuthorizer:
+    handler: src/authorizers/iot.default
+  elaborateUpload:
+    handler: src/event-handlers/elaborate-raw-upload.default
+    timeout: 900
+    events:
+      - s3:
+          bucket: ${self:custom.resources.audioBucket}
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - suffix: .base64
+  # audioSignalReaction:
+  #   handler: src/event-handlers/audio-signal-reaction.default
+  #   events:
+  #     - s3:
+  #         bucket: ${self:custom.resources.audioBucket}
+  #         event: s3:ObjectCreated:*
+  #         existing: true
+  #         rules:
+  #           - suffix: .base64
+  elaborateSchedulerEvent:
+    handler: src/event-handlers/scheduler-event-changed.default
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [schedulerTable, StreamArn]
+  seniorAppEventReaction:
+    handler: src/event-handlers/senior-app-event-reaction.default
+    events:
+      - iot:
+          sql: "SELECT *, topic() as topic FROM '+/senior-app/events'"
+          enabled: true
+  seniorAppAnswer:
+    handler: src/event-handlers/senior-app-answer.default
+    events:
+      - iot:
+          sql: "SELECT *, topic() as topic FROM '+/senior-app/answer'"
+          enabled: true
+  periodicListeningAction:
+    handler: src/event-handlers/periodic-listening-action.default
+    events:
+      - schedule:
+          rate: cron(0/15 6-22 ? * * *)
+          enabled: true
+    

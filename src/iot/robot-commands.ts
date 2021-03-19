@@ -1,6 +1,7 @@
 import { IoTDataPlaneClient, PublishCommand } from "@aws-sdk/client-iot-data-plane";
 import { PollyClient, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
 import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
+import logEvent from "../data/log-event";
 import { Robot } from "../data/models/robot.model";
 
 const iotData = new IoTDataPlaneClient({});
@@ -45,22 +46,33 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
     params
   });
 
+  // await iotData.send(new PublishCommand({
+  //   topic: robot.topic  + '/command',
+  //   payload: (new TextEncoder()).encode(JSON.stringify({
+  //     guardian_command: 'speak_from_url',
+  //     guardian_data: url
+  //   }))
+  // }));
+
   await iotData.send(new PublishCommand({
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      command: 'speak',
-      data: {
-        url
-      }
+      guardian_command: 'speak_to_user',
+      guardian_data: message
     }))
-  }))
+  }));
+  
+  await logEvent(robot.serial_number, 'sent_speak_command', { message, language });
+  
 } 
 
 export async function sendListenCommand(robot: Robot) {
   await iotData.send(new PublishCommand({
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      command: 'listen',
+      guardian_command: 'record_audio',
+      guardian_data: null,
     }))
   }))
+  await logEvent(robot.serial_number, 'sent_listen_command');
 }

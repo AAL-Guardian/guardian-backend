@@ -88,6 +88,7 @@ async function detectAngle(one: S3EventRecord) {
       Payload: (new TextEncoder()).encode(JSON.stringify({
         bucket: one.s3.bucket.name,
         key: one.s3.object.key,
+        window: "0"
       }))
     }));
     const response = new TextDecoder('utf-8').decode(visualization.Payload).toString();

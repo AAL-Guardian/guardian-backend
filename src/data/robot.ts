@@ -149,7 +149,7 @@ async function closeAssignment(id: number) {
 }
 
 export async function getRobotAssignment(robot_serial_number?: string, client_id?: string): Promise<Assignment> {
-  if(!robot_serial_number && !client_id) {
+  if (!robot_serial_number && !client_id) {
     throw new Error('You must specify at lest one of robot_serial_number, client_id');
   }
   const assignment = await executeStatement(`
@@ -175,6 +175,15 @@ export async function getRobotAssignment(robot_serial_number?: string, client_id
     }
   ]);
   return assignment[0];
+}
+
+export async function getActiveAssignments() {
+  const assignments = await executeStatement(`
+  SELECT *
+  FROM robot_assignment
+  WHERE is_active = true
+    AND current_timestamp BETWEEN start_date AND IFNULL(end_date, current_timestamp)`);
+  return assignments as Assignment[];
 }
 
 export async function getRobotAssignmentById(assignmentId: number): Promise<Assignment> {

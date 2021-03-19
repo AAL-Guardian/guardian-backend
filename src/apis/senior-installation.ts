@@ -34,7 +34,7 @@ export default async function (event: APIGatewayEvent, context: any) {
   const responseBody: InstallationResponse = {
     endpoint: endpoint.endpointAddress,
     clientId: 'senior-' + body.clientId,
-    robotTopic: 'misty-' + robot.topic,
+    robotTopic: robot.topic,
     token
   };
   response.body = JSON.stringify(responseBody);

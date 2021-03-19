@@ -50,13 +50,10 @@ export async function launchReportRequest(reportRequest: ReportRequest) {
     return;
   }
   const assignment = await getRobotAssignment(undefined, reportRequest.client_id);
-  const reportSetup = await getReportSetup(reportRequest.report_type_id);
-
   const robot = await getRobotBySN(assignment.robot_serial_number);
   
   await Promise.all([
-    sendReportRequest(robot, reportRequest, reportSetup),
-    sendSpeakCommand(robot, reportSetup.start_question.description, 'en')
+    sendReportRequest(robot, reportRequest),
   ])
   
 

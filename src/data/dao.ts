@@ -76,7 +76,7 @@ export async function updateStatement(table_name: string, set: SqlParameter[], w
 }
 
 export async function selectStatement(table_name: string, parameters?: SqlParameter[], mapResults = true) {
-  const sql = `SELECT * FROM ${table_name} WHERE ${parameters.map(one => `${one.name} = :${one.name}`).join(' AND ')}`;
+  const sql = `SELECT * FROM ${table_name} WHERE ${parameters.length > 0 ? parameters.map(one => `${one.name} = :${one.name}`).join(' AND ') : '1 = 1'}`;
   console.log(sql, parameters);
   return await executeStatement(sql, parameters, mapResults);
 }
