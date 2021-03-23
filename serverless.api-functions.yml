@@ -50,3 +50,10 @@ functions:
           path: /schedule/{eventId}/recheck
           method: POST
           cors: true
+  customLog:
+    handler: src/apis/custom-log-event.default
+    events:
+      - http:
+          path: /robot/{robotCode}/log
+          method: POST
+          cors: true

@@ -80,18 +80,6 @@ export default async function (event: APIGatewayEvent) {
   const command = `openssl pkcs12 -export -in /tmp/${thing.thingName}.pem -inkey /tmp/${thing.thingName}.key -out /tmp/${thing.thingName}.pfx -passout pass: -certfile ${__dirname}/../AmazonRootCA1.pem`;
   await shellExec(command);
 
-  await s3.send(new PutObjectCommand({
-    Bucket: process.env.bucketName,
-    Key: cert.certificateId + '.pfx',
-    Expires: dayjs().add(3600, 'seconds').toDate(),
-    Body: await promises.readFile(`/tmp/${thing.thingName}.pfx`)
-  }));
-
-  const signedUrl = await getSignedUrl(s3, new GetObjectCommand({
-    Bucket: process.env.bucketName,
-    Key: cert.certificateId + '.pfx'
-  }), { expiresIn: 3600 })
-
   const responseBody = {
     // token,
     clientId: thing.thingName,
@@ -107,7 +95,6 @@ export default async function (event: APIGatewayEvent) {
       certificatePem: cert.certificatePem,
       keyPair: cert.keyPair,
       pfxBase64: (await promises.readFile(`/tmp/${thing.thingName}.pfx`)).toString('base64'),
-      pfxUrl: signedUrl
     }
   } as InstallationResponse;
 
