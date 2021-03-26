@@ -20,6 +20,13 @@ functions:
           path: /test/report-request/{requestId}
           method: GET
           cors: true
+  sendConditionalReportRequest:
+    handler: src/apis/tests/send-conditional-report-request.default
+    events:
+      - http:
+          path: /test/report-request/{requestId}
+          method: GET
+          cors: true
   periodicPingRobot:
     handler: src/event-handlers/tests/periodic-ping-robot.default
     events:

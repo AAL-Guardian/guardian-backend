@@ -46,23 +46,15 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
     params
   });
 
-  // await iotData.send(new PublishCommand({
-  //   topic: robot.topic  + '/command',
-  //   payload: (new TextEncoder()).encode(JSON.stringify({
-  //     guardian_command: 'speak_from_url',
-  //     guardian_data: url
-  //   }))
-  // }));
-
   await iotData.send(new PublishCommand({
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      guardian_command: 'speak_to_user',
-      guardian_data: message
+      guardian_command: 'speak_from_url',
+      guardian_data: url
     }))
   }));
   
-  await logEvent(robot.serial_number, 'sent_speak_command', { message, language });
+  await logEvent(robot.serial_number, 'sent_speak_command', { message, language, url });
   
 } 
 
@@ -71,8 +63,20 @@ export async function sendListenCommand(robot: Robot) {
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'record_audio',
-      guardian_data: null,
+      guardian_detail: null,
     }))
   }))
   await logEvent(robot.serial_number, 'sent_listen_command');
+}
+
+
+export async function sendMoveHeadCommand(robot: Robot, angle: number) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic  + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'move_head',
+      guardian_detail: angle,
+    }))
+  }))
+  await logEvent(robot.serial_number, 'moved_head', angle);
 }

@@ -1,12 +1,11 @@
 
 import { DATETIME_FORMAT, executeStatement } from "../data/dao";
 import { ReportRequest } from "../data/models/report-request.model";
-import { getReportSetup } from "../data/report";
 import { getRobotAssignment, getRobotBySN } from "../data/robot";
 import { getReportRequestById, MIN_WINDOW_DIFF } from "../data/schedule";
-import { sendSpeakCommand } from "../iot/robot-commands";
 import { sendReportRequest } from "../iot/senior-app-commands";
 import dayjs = require("dayjs");
+import { sendListenCommand } from "../iot/robot-commands";
 
 export async function checkUserAndLaunchReportRequest(id: string) {
   //grab report request
@@ -19,7 +18,7 @@ export async function checkUserAndLaunchReportRequest(id: string) {
   }
   //check if there was voice in the last minutes
   const guardian_log = await executeStatement(`SELECT *
-  FROM guardian_log
+  FROM guardian_event
   WHERE event_name = 'voice_detected'
   AND robot_serial_number = :robot_serial_number
   AND timestamp >= :min_time`, [
@@ -38,6 +37,8 @@ export async function checkUserAndLaunchReportRequest(id: string) {
 
   if (guardian_log.length === 0) {
     console.info('No voice detected in last 15 minutes, skipping report request');
+    const robot = await getRobotBySN(assignment.robot_serial_number);
+    await sendListenCommand(robot);
     return;
   }
   // launching request

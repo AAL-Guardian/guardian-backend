@@ -7,7 +7,7 @@ export default async function (params: CloudWatchLogsEvent) {
     topic: 'misty-20194503592/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'stability_test',
-      guardian_data: null,
+      guardian_detail: null,
     }))
   }))
 }
