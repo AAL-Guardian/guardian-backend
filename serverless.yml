@@ -58,7 +58,7 @@ provider:
   region: eu-west-1
   memorySize: 1024
   timeout: 30
-  profile: ${opt:profile, env:profile, 'default'}
+  profile: ${opt:profile, env:profile}
   lambdaHashingVersion: "20201221"
   apiGateway:
     minimumCompressionSize: 1024
