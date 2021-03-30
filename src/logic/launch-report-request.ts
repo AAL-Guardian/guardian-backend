@@ -3,13 +3,21 @@ import { DATETIME_FORMAT, executeStatement } from "../data/dao";
 import { ReportRequest } from "../data/models/report-request.model";
 import { getRobotAssignment, getRobotBySN } from "../data/robot";
 import { getReportRequestById, MIN_WINDOW_DIFF } from "../data/schedule";
+import { sendListenCommand } from "../iot/robot-commands";
 import { sendReportRequest } from "../iot/senior-app-commands";
 import dayjs = require("dayjs");
-import { sendListenCommand } from "../iot/robot-commands";
 
 export async function checkUserAndLaunchReportRequest(id: string) {
   //grab report request
   const report_request = await getReportRequestById(id);
+  if(report_request.date_deleted) {
+    console.log('Report was deleted, wont launch', report_request);
+    return;
+  }
+  if(report_request.date_shown) {
+    console.log('Report aready shown, wont launch', report_request);
+    return;
+  }
   //get assignment for a certain client
   const assignment = await getRobotAssignment(undefined, report_request.client_id);
   if (!assignment) {
