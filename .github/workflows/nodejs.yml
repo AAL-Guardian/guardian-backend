@@ -33,6 +33,6 @@ jobs:
         npm i
         git lfs fetch
         git lfs checkout
-        npx serverless deploy --stage=dev
+        npx serverless deploy --stage=dev -f queryTest
       env:
         CI: true
