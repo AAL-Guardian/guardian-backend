@@ -8,7 +8,6 @@ import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { promises } from 'fs';
 import { getResponse } from "../common/response.template";
 import logEvent from '../data/log-event';
-import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
 import shellExec = require('shell-exec');
 import { getRobotBySN, insertRobot } from '../data/robot';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
@@ -28,7 +27,7 @@ if (process.env.IS_OFFLINE === 'true') {
 
 export default async function (event: APIGatewayEvent) {
   const response = getResponse() as APIGatewayProxyResult;
-  const body = JSON.parse(event.body) as InstallationRequest;
+  const body = JSON.parse(event.body);
 
   const robot = body.robotCode;
 
@@ -96,7 +95,7 @@ export default async function (event: APIGatewayEvent) {
       keyPair: cert.keyPair,
       pfxBase64: (await promises.readFile(`/tmp/${thing.thingName}.pfx`)).toString('base64'),
     }
-  } as InstallationResponse;
+  };
 
   if (!robotObject) {
     await insertRobot(robot, thing.thingName, thing.thingName, undefined, true);

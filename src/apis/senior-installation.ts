@@ -1,9 +1,11 @@
 import { DescribeEndpointCommand, IoTClient } from '@aws-sdk/client-iot';
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import { selectStatement } from '../data/dao';
 import { getResponse } from "../common/response.template";
 import { saveSeniorClient } from "../data/access-token";
-import { InstallationRequest, InstallationResponse } from "../data/models/installation.model";
 import { assignRobot, getRobotAssignment, getRobotAssignmentById, getRobotBySN } from "../data/robot";
+import { Client } from '../data/models/client.model';
+import { Person } from '../data/models/person.model';
 
 const iot = new IoTClient({
   region: 'eu-west-1'
@@ -11,15 +13,31 @@ const iot = new IoTClient({
 
 export default async function (event: APIGatewayEvent, context: any) {
   const response = getResponse() as APIGatewayProxyResult;
-  const body = JSON.parse(event.body) as InstallationRequest;
+  const body = JSON.parse(event.body);
   const robotCode = body.robotCode;
   const clientId = body.clientId;
 
-  let [assignment, robot] = await Promise.all([
+  let [ assignment, robot, clients ] = await Promise.all([
     getRobotAssignment(robotCode, clientId),
-    getRobotBySN(robotCode)
+    getRobotBySN(robotCode),
+    selectStatement('clients', [
+      {
+        name: 'id',
+        value: {
+          stringValue: clientId
+        }
+      }
+    ])
   ]);
-
+  const [ client ] = clients as Client[];
+  const [ person ] = await selectStatement('persons', [
+    {
+      name: 'id',
+      value: {
+        stringValue: client.person_id
+      }
+    }
+  ]) as Person[]
   if (!assignment) {
     const assignmentId = await assignRobot(robot.serial_number, clientId);
     assignment = await getRobotAssignmentById(assignmentId);
@@ -31,11 +49,12 @@ export default async function (event: APIGatewayEvent, context: any) {
     endpointType: 'iot:Data-ATS'
   }));
 
-  const responseBody: InstallationResponse = {
+  const responseBody = {
     endpoint: endpoint.endpointAddress,
     clientId: 'senior-' + body.clientId,
     robotTopic: robot.topic,
-    token
+    token,
+    clientName: person.name,
   };
   response.body = JSON.stringify(responseBody);
   return response;
