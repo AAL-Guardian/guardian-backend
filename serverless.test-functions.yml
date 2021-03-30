@@ -24,7 +24,7 @@ functions:
     handler: src/apis/tests/send-conditional-report-request.default
     events:
       - http:
-          path: /test/report-request/{requestId}
+          path: /test/report-request/{requestId}/conditional
           method: GET
           cors: true
   periodicPingRobot:

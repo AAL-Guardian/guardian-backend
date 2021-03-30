@@ -1,10 +1,9 @@
 import { Field } from "@aws-sdk/client-rds-data";
 import { DATE_FORMAT, executeStatement, insertStatement, selectStatement, updateStatement } from "./dao";
+import { Assignment } from "./models/assignment.model";
+import { Client } from "./models/client.model";
 import { Robot } from "./models/robot.model";
 import dayjs = require("dayjs");
-import { Client } from "./models/client.model";
-import { Assignment } from "./models/assignment.model";
-import { throws } from "node:assert";
 
 export async function getRobotBySN(serial_number: string): Promise<Robot | undefined> {
   // const all = await executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
@@ -18,7 +17,7 @@ export async function getRobotBySN(serial_number: string): Promise<Robot | undef
 }
 
 export async function insertRobot(serial_number: string, thing_name: string, topic: string, extra = null, is_active = true): Promise<boolean> {
-  await executeStatement("INSERT INTO robot (serial_number, thing_name, topic, extra, is_active) VALUES (:serial_number, :thing_name, :topic, :extra, :is_active)", [
+  await insertStatement("robot", [
     {
       name: 'serial_number',
       value: {

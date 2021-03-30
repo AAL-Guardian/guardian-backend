@@ -6,6 +6,7 @@ export interface ReportQuestionOption {
   name: string;
   description: string;
   sort_order: number;
-
+  
+  selected?: boolean;
   followup_question?: ReportQuestion;
 }

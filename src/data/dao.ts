@@ -15,6 +15,7 @@ export const DATE_FORMAT = 'YYYY-MM-DD'
 export async function executeStatement(sql: string, parameters?: SqlParameter[], mapResults = true): Promise< { [key: string]: any }[] | ExecuteStatementResponse> {
   try {
     let res;
+    console.log('statement', sql, parameters);
     if (process.env.IS_OFFLINE === 'true') {
       res = await require('./connected-dao').executeStatement(sql, parameters);
     } else {
@@ -50,34 +51,34 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
 
   } catch (e) {
     console.log('logga errore?');
-    if (e.code === 'BadRequestException') {
-      if ((e.message as string).startsWith('Communications link failure')) {
+    console.log(e, sql, parameters);
+    if (e?.code === 'BadRequestException') {
+      if ((e?.message as string).startsWith('Communications link failure')) {
         console.warn('Request timed out, cold start?');
         return await executeStatement(sql, parameters);
       }
     }
-    console.log(e, sql, parameters);
     throw e;
   }
 }
 
 export async function insertStatement(table_name: string, parameters?: SqlParameter[]) {
   const sql = `INSERT INTO ${table_name} (${parameters.map(one => one.name).join(', ')}) VALUES (${parameters.map(one => ':' + one.name).join(', ')})`;
-  console.log(table_name, parameters)
+  // console.log(table_name, parameters)
   const res = await executeStatement(sql, parameters, false) as ExecuteStatementResponse;
   return res.generatedFields.map(raw => Object.values(raw)[0]);
 }
 
 export async function updateStatement(table_name: string, set: SqlParameter[], where: SqlParameter[]) {
   const sql = `UPDATE ${table_name} SET ${set.map(one => `${one.name} = :${one.name}`).join(', ')} WHERE ${where.map(one => `${one.name} = :${one.name}`).join(' AND ')}`;
-  console.log(sql, set, where);
-  const res = await executeStatement(sql, [...set, ...where]);
+  // console.log(sql, set, where);
+  const res = await executeStatement(sql, [...set, ...where], false);
   return res;
 }
 
 export async function selectStatement(table_name: string, parameters?: SqlParameter[], mapResults = true) {
   const sql = `SELECT * FROM ${table_name} WHERE ${parameters.length > 0 ? parameters.map(one => `${one.name} = :${one.name}`).join(' AND ') : '1 = 1'}`;
-  console.log(sql, parameters);
+  // console.log(sql, parameters);
   return await executeStatement(sql, parameters, mapResults);
 }
 

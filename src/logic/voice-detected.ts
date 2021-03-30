@@ -4,7 +4,6 @@ import { launchReportRequest } from "./launch-report-request";
 
 export async function voiceDetected(robot_id: string, timestamp: string) {
   const client = await getClientByRobotSN(robot_id);
-  console.log(client);
   if(!client) {
     return;
   }

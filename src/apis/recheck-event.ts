@@ -12,7 +12,7 @@ export default async function (event: APIGatewayEvent) {
   const response = getResponse() as APIGatewayProxyResult;
 
   const scheduled = await getReportRequestById(event.pathParameters.eventId);
-  console.log(scheduled);
+
   if (scheduled) {
     const time = dayjs(scheduled.date_scheduled);
 

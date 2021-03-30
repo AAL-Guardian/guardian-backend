@@ -1,0 +1,36 @@
+name: Build and Deploy
+
+on: 
+  push:
+    branches:
+      - development
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Uses Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - name: Get Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.npm
+          node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: npm install, build, and test
+      run: |
+        npm i
+        git lfs fetch
+        git lfs checkout
+        npx serverless deploy -stage=dev
+      env:
+        CI: true

@@ -1,13 +1,13 @@
 import dayjs = require("dayjs");
-import { DATETIME_FORMAT, executeStatement } from "./dao";
+import { DATETIME_FORMAT, executeStatement, selectStatement } from "./dao";
 import { ReportRequest } from "./models/report-request.model";
 
 export const MIN_WINDOW_DIFF = 15;
 
 export async function getScheduleById(id: string) {
-  const res = await executeStatement("SELECT * FROM report_request_schedule WHERE id = :id", [
+  const res = await selectStatement("report_request_schedule", [
     {
-      name: 'scope',
+      name: 'id',
       value: {
         stringValue: id
       }
@@ -17,7 +17,7 @@ export async function getScheduleById(id: string) {
 }
 
 export async function getReportRequestById(id: string): Promise<ReportRequest> {
-  const res = await executeStatement("SELECT * FROM report_request WHERE id = :id", [
+  const res = await selectStatement("report_request", [
     {
       name: 'id',
       value: {
