@@ -18,7 +18,7 @@ export default async function (event: APIGatewayEvent) {
 
   const signedUrl = await getSignedUrl(s3, new PutObjectCommand({
     Bucket: process.env.bucketName,
-    Key: robotCode + '-' + new Date().getTime() + '.base64'
+    Key: robotCode + '_' + new Date().getTime() + '.base64'
   }), { expiresIn: 3600 })
   response.body = JSON.stringify({
     signedUrl

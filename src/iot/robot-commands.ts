@@ -63,7 +63,7 @@ export async function sendListenCommand(robot: Robot) {
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'record_audio',
-      guardian_detail: null,
+      guardian_data: null,
     }))
   }))
   await logEvent(robot.serial_number, 'sent_listen_command');
@@ -75,7 +75,7 @@ export async function sendMoveHeadCommand(robot: Robot, angle: number) {
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'move_head',
-      guardian_detail: angle,
+      guardian_data: angle,
     }))
   }))
   await logEvent(robot.serial_number, 'moved_head', angle);

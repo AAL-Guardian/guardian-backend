@@ -19,7 +19,7 @@ export default async function (event: S3Event) {
     await convertAudio(one);
     const presenceDetected = await detectVoice(one);
     if(presenceDetected.length > 0) {
-      const [sn, angle, timestamp] = one.s3.object.key.split('-');
+      const [sn, angle, timestamp] = one.s3.object.key.split('_');
       await voiceDetected(sn, timestamp)
 
       const voiceAngle = await detectAngle(one, presenceDetected);
@@ -36,7 +36,7 @@ export default async function (event: S3Event) {
 async function convertAudio(one: S3EventRecord) {
   try {
     // convert audio file to wav
-    const [robot, angle, timestamp] = one.s3.object.key.split('-', 3);
+    const [robot, angle, timestamp] = one.s3.object.key.split('_', 3);
     await logEvent(robot, 'robot_file_upload', { filename: one.s3.object.key });
     const data = await s3.send(new GetObjectCommand({
       Bucket: one.s3.bucket.name,
@@ -77,7 +77,7 @@ async function detectVoice(one: S3EventRecord) {
     const seg = JSON.parse(responseObj.seg);
     const hasMaleOrFemale = seg.filter(([who, start, end]) => ['male', 'female'].includes(who));
     if (hasMaleOrFemale.length > 0) {
-      const [sn, angle, timestamp] = one.s3.object.key.split('-');
+      const [sn, angle, timestamp] = one.s3.object.key.split('_');
       await logEvent(sn, 'voice_detected', JSON.stringify({
         seg,
         angle
