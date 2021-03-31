@@ -10,6 +10,10 @@ import dayjs = require("dayjs");
 export async function checkUserAndLaunchReportRequest(id: string) {
   //grab report request
   const report_request = await getReportRequestById(id);
+  if(!report_request) {
+    console.log('Report was not found, wont launch', report_request);
+    return;
+  }
   if(report_request.date_deleted) {
     console.log('Report was deleted, wont launch', report_request);
     return;
