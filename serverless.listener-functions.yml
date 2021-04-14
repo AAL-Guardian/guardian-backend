@@ -20,13 +20,19 @@ functions:
   #         existing: true
   #         rules:
   #           - suffix: .base64
-  elaborateSchedulerEvent:
-    handler: src/event-handlers/scheduler-event-changed.default
+  # elaborateSchedulerEvent:
+  #   handler: src/event-handlers/scheduler-event-changed.default
+  #   events:
+  #     - stream:
+  #         type: dynamodb
+  #         arn:
+  #           Fn::GetAtt: [schedulerTable, StreamArn]
+  elaborateSchedulerRatioEvent:
+    handler: src/event-handlers/scheduler-event-ratio.default
     events:
-      - stream:
-          type: dynamodb
-          arn:
-            Fn::GetAtt: [schedulerTable, StreamArn]
+      - schedule:
+          rate: cron(* * * * ? *)
+          enabled: true
   seniorAppEventReaction:
     handler: src/event-handlers/senior-app-event-reaction.default
     events:

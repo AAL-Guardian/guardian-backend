@@ -80,3 +80,14 @@ export async function sendMoveHeadCommand(robot: Robot, angle: number) {
   }))
   await logEvent(robot.serial_number, 'moved_head', angle);
 }
+
+export async function sendEyeContactCommand(robot: Robot, status: 'sleep' | 'normal' | 'off') {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic  + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'eye_contact',
+      guardian_data: status,
+    }))
+  }))
+  await logEvent(robot.serial_number, 'eye_contact', status);
+}

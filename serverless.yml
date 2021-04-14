@@ -114,6 +114,13 @@ provider:
             - lambda:InvokeFunction
           Resource:
             - "*"
+        - Effect: Allow
+          Action:
+            - events:DescribeRule
+            - events:PutRule
+            - events:ListRules 
+          Resource:
+            - "*"
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
     stage: ${self:provider.stage}
@@ -130,6 +137,7 @@ package:
   excludeDevDependencies: true
 
 plugins:
+  - serverless-iam-roles-per-function
   - serverless-s3-local
   - serverless-webpack
   - serverless-offline
@@ -158,27 +166,27 @@ resources:
                 - "*"
               AllowedHeaders:
                 - "*"
-    schedulerTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:service}-${self:provider.stage}-scheduler
-        BillingMode: PAY_PER_REQUEST
-        TimeToLiveSpecification:
-            AttributeName: time
-            Enabled: true
-        AttributeDefinitions:
-          -
-            AttributeName: clientId
-            AttributeType: S
-          -
-            AttributeName: eventId
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: clientId
-            KeyType: HASH
-          -
-            AttributeName: eventId
-            KeyType: RANGE
-        StreamSpecification:
-          StreamViewType: OLD_IMAGE 
+    # schedulerTable:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${self:service}-${self:provider.stage}-scheduler
+    #     BillingMode: PAY_PER_REQUEST
+    #     TimeToLiveSpecification:
+    #         AttributeName: time
+    #         Enabled: true
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: clientId
+    #         AttributeType: S
+    #       -
+    #         AttributeName: eventId
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: clientId
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: eventId
+    #         KeyType: RANGE
+    #     StreamSpecification:
+    #       StreamViewType: OLD_IMAGE 
