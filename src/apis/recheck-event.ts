@@ -7,7 +7,7 @@ export default async function (event: APIGatewayEvent) {
   const response = getResponse() as APIGatewayProxyResult;
 
   const scheduled = await getReportRequestById(event.pathParameters.eventId);
-  console.log(`Asket recheck for ${scheduled}`);
+  console.log(`Asked recheck for ${scheduled}`);
   await scheduleNextEvent();
   response.statusCode = 204;
   return response;
