@@ -58,7 +58,7 @@ export async function getPendingReportRequest(client_id?: string): Promise<Repor
       name: 'client_id',
       value: {
         stringValue: client_id ? client_id : undefined,
-        isNull: !client_id
+        isNull: !client_id ? undefined : true
       } as Field
     },
     {

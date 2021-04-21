@@ -47,6 +47,13 @@ functions:
           sql: "SELECT reportRequest, reportSetup, topic(1) as robot_topic FROM '+/senior-app/answer'"
           enabled: true
           sqlVersion: '2016-03-23'
+  robotEventHandler:
+    handler: src/event-handlers/robot-event-reaction.default
+    events:
+      - iot:
+          sql: "SELECT * as data, topic(1) as robot_topic FROM '+/event'"
+          enabled: true
+          sqlVersion: '2016-03-23'
   periodicListeningAction:
     handler: src/event-handlers/periodic-listening-action.default
     events:

@@ -37,7 +37,7 @@ export async function checkUserAndLaunchReportRequest(id: string) {
     {
       name: 'robot_serial_number',
       value: {
-        stringValue: report_request.client_id
+        stringValue: assignment.robot_serial_number
       }
     },{
       name: 'min_time',

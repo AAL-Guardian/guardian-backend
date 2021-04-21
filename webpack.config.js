@@ -60,6 +60,5 @@ module.exports = {
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
-     
   ]
 };
