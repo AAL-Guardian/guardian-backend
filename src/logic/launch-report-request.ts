@@ -1,11 +1,13 @@
 
-import { DATETIME_FORMAT, executeStatement } from "../data/dao";
+import { DATETIME_FORMAT, executeStatement, selectStatement } from "../data/dao";
 import { ReportRequest } from "../data/models/report-request.model";
 import { getRobotAssignment, getRobotBySN } from "../data/robot";
 import { getReportRequestById, MIN_WINDOW_DIFF } from "../data/schedule";
-import { sendListenCommand } from "../iot/robot-commands";
+import { sendListenCommand, sendSpeakCommand } from "../iot/robot-commands";
 import { sendReportRequest } from "../iot/senior-app-commands";
 import dayjs = require("dayjs");
+import { Client } from "../data/models/client.model";
+import { Person } from "../data/models/person.model";
 
 export async function checkUserAndLaunchReportRequest(id: string) {
   //grab report request
@@ -50,6 +52,26 @@ export async function checkUserAndLaunchReportRequest(id: string) {
   if (guardian_log.length === 0) {
     console.info('No voice detected in last 15 minutes, skipping report request');
     const robot = await getRobotBySN(assignment.robot_serial_number);
+    const [ client ] = await selectStatement('clients', [
+      {
+        name: 'id',
+        value: {
+          stringValue: assignment.clients_id
+        }
+      }
+    ]) as Client[];
+    const [ person ] = await selectStatement('persons', [
+      {
+        name: 'id',
+        value: {
+          stringValue: client.person_id
+        }
+      }
+    ]) as Person[]
+    
+    await sendSpeakCommand(robot, `Hey, ${person.name} are you there?`, 'en');
+    /** wait 3 seconds */
+    await new Promise(resolve => setTimeout(resolve, 2000) );
     await sendListenCommand(robot);
     return;
   }
