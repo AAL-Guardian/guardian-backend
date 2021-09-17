@@ -1,12 +1,19 @@
-import { RDSDataClient, ExecuteStatementCommand, SqlParameter, ExecuteStatementResponse } from '@aws-sdk/client-rds-data';
-// import { fromIni } from '@aws-sdk/credential-provider-ini';
-
-const client = new RDSDataClient({
+import { RDSDataClient, ExecuteStatementCommand, SqlParameter, ExecuteStatementResponse, RDSDataClientConfig } from '@aws-sdk/client-rds-data';
+import { fromIni } from '@aws-sdk/credential-provider-ini';
+import { executeStatement as connectedStatement } from './connected-dao';
+let client: RDSDataClient;
+const rdsOptions = {
   region: 'eu-west-1'
-});
-
+} as RDSDataClientConfig;
 if (process.env.IS_OFFLINE === 'true') {
-  client.config.credentialDefaultProvider = require('@aws-sdk/credential-provider-ini').fromIni({ profile: process.env.profile })
+  rdsOptions.credentials = fromIni({ profile: process.env.profile });
+  rdsOptions.endpoint = async () => ({
+    hostname: `rds-data.${rdsOptions.region}.amazonaws.com`,
+    port: undefined,
+    protocol: 'https:',
+    path: '/',
+    query: undefined
+  })
 }
 
 export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
@@ -16,9 +23,12 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
   try {
     let res;
     console.log('statement', sql, parameters);
-    if (process.env.IS_OFFLINE === 'true') {
-      res = await require('./connected-dao').executeStatement(sql, parameters);
+    if (false && process.env.IS_OFFLINE === 'true') {
+      res = await connectedStatement(sql, parameters);
     } else {
+      if(!client) {
+        client = new RDSDataClient(rdsOptions);
+      }
       const start = Date.now();
       res = await client.send(new ExecuteStatementCommand({
         resourceArn: process.env.auroraDBArn,
@@ -76,9 +86,9 @@ export async function updateStatement(table_name: string, set: SqlParameter[], w
   return res;
 }
 
-export async function selectStatement(table_name: string, parameters?: SqlParameter[], mapResults = true) {
-  const sql = `SELECT * FROM ${table_name} WHERE ${parameters.length > 0 ? parameters.map(one => `${one.name} = :${one.name}`).join(' AND ') : '1 = 1'}`;
+export async function selectStatement<T = { [key: string]: any }>(table_name: string, parameters?: SqlParameter[]): Promise<T[]> {
+  const sql = `SELECT * FROM ${table_name} WHERE ${parameters?.length > 0 ? parameters.map(one => `${one.name} = :${one.name}`).join(' AND ') : '1 = 1'}`;
   // console.log(sql, parameters);
-  return await executeStatement(sql, parameters, mapResults);
+  return await executeStatement(sql, parameters, true) as T[];
 }
 

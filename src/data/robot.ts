@@ -7,7 +7,7 @@ import dayjs = require("dayjs");
 
 export async function getRobotBySN(serial_number: string): Promise<Robot | undefined> {
   // const all = await executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
-  const all = await selectStatement("robot", [{
+  const all = await selectStatement<Robot>("robot", [{
     name: 'serial_number',
     value: {
       stringValue: serial_number
@@ -186,7 +186,7 @@ export async function getActiveAssignments() {
 }
 
 export async function getRobotAssignmentById(assignmentId: number): Promise<Assignment> {
-  const list = await selectStatement('robot_assignment', [{
+  const list = await selectStatement<Assignment>('robot_assignment', [{
     name: 'id',
     value: {
       longValue: assignmentId

@@ -7,13 +7,13 @@ import { ReportRequest } from "./models/report-request.model";
 import { ReportType } from "./models/report-type.model";
 import { Client } from "./models/client.model";
 
-export async function getReportSetup(report_type_id: number) {
-  const report_types = await selectStatement('report_type', [{
+export async function getReportSetup(report_type_id: number): Promise<ReportType> {
+  const [ report_type ] = await selectStatement<ReportType>('report_type', [{
     name: 'id',
     value: { longValue: report_type_id }
-  }]) as ReportType;
-  const report_type = report_types[0];
-  const report_questions = await executeStatement(
+  }]);
+  
+  const [ report_question ] = await executeStatement(
     `SELECT rq.*
       FROM report_question rq
         LEFT JOIN report_question_followup rqf on rq.id = rqf.followup_question_id
@@ -26,8 +26,8 @@ export async function getReportSetup(report_type_id: number) {
           longValue: report_type_id
         }
       }
-    ]);
-  report_type.start_question = report_questions[0];
+    ]) as ReportQuestion[];
+  report_type.start_question = report_question;
   report_type.start_question.options = await getQuestionOptions(report_type.start_question.id, true);
   return report_type;
 }

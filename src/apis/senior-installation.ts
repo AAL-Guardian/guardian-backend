@@ -20,7 +20,7 @@ export default async function (event: APIGatewayEvent, context: any) {
   let [ assignment, robot, clients ] = await Promise.all([
     getRobotAssignment(robotCode, clientId),
     getRobotBySN(robotCode),
-    selectStatement('clients', [
+    selectStatement<Client>('clients', [
       {
         name: 'id',
         value: {
@@ -29,15 +29,15 @@ export default async function (event: APIGatewayEvent, context: any) {
       }
     ])
   ]);
-  const [ client ] = clients as Client[];
-  const [ person ] = await selectStatement('persons', [
+  const [ client ] = clients;
+  const [ person ] = await selectStatement<Person>('persons', [
     {
       name: 'id',
       value: {
         stringValue: client.person_id
       }
     }
-  ]) as Person[]
+  ])
   if (!assignment) {
     const assignmentId = await assignRobot(robot.serial_number, clientId);
     assignment = await getRobotAssignmentById(assignmentId);
@@ -52,6 +52,7 @@ export default async function (event: APIGatewayEvent, context: any) {
   const responseBody = {
     endpoint: endpoint.endpointAddress,
     clientId: 'senior-' + body.clientId,
+    clientLang: person.language,
     robotTopic: robot.topic,
     token,
     clientName: person.name,

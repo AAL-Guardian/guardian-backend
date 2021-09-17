@@ -57,3 +57,24 @@ functions:
           path: /robot/{robotCode}/log
           method: POST
           cors: true
+
+  restJWTAuthorizer:
+    handler: src/authorizers/rest-api-jwt-authorizer.default
+
+  getRobotSettings:
+    handler: src/apis/get-robot-settings.default
+    events:
+      - http:
+          path: /robot/settings
+          method: GET
+          cors: true
+          authorizer: restJWTAuthorizer
+  
+  setRobotSettings:
+    handler: src/apis/set-robot-settings.default
+    events:
+      - http:
+          path: /robot/settings
+          method: POST
+          cors: true
+          authorizer: restJWTAuthorizer

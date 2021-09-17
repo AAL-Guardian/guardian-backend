@@ -18,7 +18,7 @@ export async function getScheduleById(id: string) {
 }
 
 export async function getReportRequestById(id: string): Promise<ReportRequest> {
-  const res = await selectStatement("report_request", [
+  const res = await selectStatement<ReportRequest>("report_request", [
     {
       name: 'id',
       value: {

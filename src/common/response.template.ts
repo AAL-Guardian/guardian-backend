@@ -9,5 +9,6 @@ const template = {
   body: undefined
 };
 
+/** @deprecated */
 export const getResponseV2 = () =>  ( { ...template } as APIGatewayProxyStructuredResultV2 );
 export const getResponse = () =>  ( { ...template } as APIGatewayProxyResult );

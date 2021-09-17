@@ -5,6 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch via NPM",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "debug"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node",
+      "env": {"IS_OFFLINE":"true", "AWS_SDK_LOAD_CONFIG":"1","AWS_SDK_LOAD_CREDENTIALS":"1","SLS_DEBUG":"*", "DEBUG":"mqttjs*"},
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Debug Serverless",
