@@ -78,3 +78,12 @@ functions:
           method: POST
           cors: true
           authorizer: restJWTAuthorizer
+  
+  getTodayAppointments:
+    handler: src/apis/get-today-appointments.default
+    events:
+      - http:
+          path: /appointment/today
+          method: GET
+          cors: true
+          authorizer: restJWTAuthorizer
