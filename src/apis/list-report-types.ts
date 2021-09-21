@@ -1,11 +1,11 @@
 import { APIGatewayEvent } from "aws-lambda";
-import { getResponseV2 } from "../common/response.template";
+import { getResponse } from "../common/response.template";
 import { selectStatement } from "../data/dao";
 import { ReportType } from "../data/models/report-type.model";
 import { Translation } from "../data/models/translation.model";
 
 export default async function (event: APIGatewayEvent) {
-  const response = getResponseV2();
+  const response = getResponse();
 
   const list = await selectStatement<ReportType>("report_type");
   const translations = await selectStatement<Translation>("translations", [{

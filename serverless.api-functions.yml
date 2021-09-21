@@ -58,8 +58,8 @@ functions:
           method: POST
           cors: true
 
-  restJWTAuthorizer:
-    handler: src/authorizers/rest-api-jwt-authorizer.default
+  assignmentTokenAuthorizer:
+    handler: src/authorizers/assignment-token-authorizer.default
 
   getRobotSettings:
     handler: src/apis/get-robot-settings.default
@@ -68,7 +68,7 @@ functions:
           path: /robot/settings
           method: GET
           cors: true
-          authorizer: restJWTAuthorizer
+          authorizer: assignmentTokenAuthorizer
   
   setRobotSettings:
     handler: src/apis/set-robot-settings.default
@@ -77,7 +77,7 @@ functions:
           path: /robot/settings
           method: POST
           cors: true
-          authorizer: restJWTAuthorizer
+          authorizer: assignmentTokenAuthorizer
   
   getTodayAppointments:
     handler: src/apis/get-today-appointments.default
@@ -86,4 +86,21 @@ functions:
           path: /appointment/today
           method: GET
           cors: true
-          authorizer: restJWTAuthorizer
+          authorizer: assignmentTokenAuthorizer
+
+  extractTranslations:
+    handler: src/apis/extract-translations.default
+    events:
+      - http:
+          path: /translations/{lang}
+          method: GET
+          cors: true
+          
+  
+  importTranslations:
+    handler: src/apis/import-translations.default
+    events:
+      - http:
+          path: /translations/{lang}
+          method: POST
+          cors: true

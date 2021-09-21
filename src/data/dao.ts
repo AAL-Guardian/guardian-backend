@@ -1,46 +1,16 @@
-import { RDSDataClient, ExecuteStatementCommand, SqlParameter, ExecuteStatementResponse, RDSDataClientConfig } from '@aws-sdk/client-rds-data';
-import { fromIni } from '@aws-sdk/credential-provider-ini';
-import { executeStatement as connectedStatement } from './connected-dao';
-let client: RDSDataClient;
-const rdsOptions = {
-  region: 'eu-west-1'
-} as RDSDataClientConfig;
-if (process.env.IS_OFFLINE === 'true') {
-  rdsOptions.credentials = fromIni({ profile: process.env.profile });
-  rdsOptions.endpoint = async () => ({
-    hostname: `rds-data.${rdsOptions.region}.amazonaws.com`,
-    port: undefined,
-    protocol: 'https:',
-    path: '/',
-    query: undefined
-  })
-}
-
+import { ExecuteStatementResponse, SqlParameter } from '@aws-sdk/client-rds-data';
+import { executeStatement as connectedStatement } from './connected-statement';
+// import { executeStatement as dataApiStatement } from './data-api-statement';
 export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const DATE_FORMAT = 'YYYY-MM-DD'
 
-export async function executeStatement(sql: string, parameters?: SqlParameter[], mapResults = true): Promise< { [key: string]: any }[] | ExecuteStatementResponse> {
+export async function executeStatement(sql: string, parameters?: SqlParameter[], mapResults = true): Promise<{ [key: string]: any }[] | ExecuteStatementResponse> {
   try {
-    let res;
-    console.log('statement', sql, parameters);
-    if (false && process.env.IS_OFFLINE === 'true') {
-      res = await connectedStatement(sql, parameters);
-    } else {
-      if(!client) {
-        client = new RDSDataClient(rdsOptions);
-      }
-      const start = Date.now();
-      res = await client.send(new ExecuteStatementCommand({
-        resourceArn: process.env.auroraDBArn,
-        secretArn: process.env.secretArn,
-        sql,
-        database: process.env.auroraSchema,
-        parameters,
-        includeResultMetadata: true,
-      }));
-      
-      console.log('Statement Time: ' + (Date.now()-start));
-    }
+    const start = Date.now();
+    const res = await connectedStatement(sql, parameters);
+    // const res = await dataApiStatement(sql, parameters);
+    console.log('Statement Time: ' + (Date.now() - start));
+
     if (mapResults) {
       let mapped = res.records?.map(one => {
         const obj = {} as { [key: string]: any };
