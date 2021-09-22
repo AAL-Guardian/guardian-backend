@@ -1,9 +1,10 @@
-import { APIGatewayProxyEventV2 } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyEventV2 } from "aws-lambda";
 import { getResponse } from "../common/response.template";
 import { selectStatement } from "../data/dao";
 import { Translation } from "../data/models/translation.model";
 
-export default async function (event: APIGatewayProxyEventV2) {
+export default async function (event: APIGatewayProxyEvent) {
+
   const response = getResponse();
   const { lang } = event.pathParameters;
   const translations = await selectStatement<Translation>('translations', [{

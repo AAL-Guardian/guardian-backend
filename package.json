@@ -20,12 +20,10 @@
   "devDependencies": {
     "@aws-sdk/credential-provider-ini": "^3.31.0",
     "@types/aws-lambda": "^8.10.83",
-    "@types/mysql": "^2.15.19",
     "@types/node": "^14.17.16",
     "@types/uuid": "^8.3.1",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.3.3",
-    "mysql": "^2.18.1",
     "serverless": "^2.59.0",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-iam-roles-per-function": "^3.2.0",
@@ -50,6 +48,7 @@
     "@aws-sdk/polly-request-presigner": "^3.31.0",
     "@aws-sdk/s3-request-presigner": "^3.31.0",
     "dayjs": "^1.10.7",
+    "mysql2": "^2.3.0",
     "shell-exec": "^1.0.2",
     "uuid": "^8.3.2"
   }

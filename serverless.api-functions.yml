@@ -88,6 +88,14 @@ functions:
           cors: true
           authorizer: assignmentTokenAuthorizer
 
+  refreshTranslations:
+    handler: src/apis/refresh-original-translations.default
+    events:
+      - http:
+          path: /translations/refresh
+          method: POST
+          cors: true
+
   extractTranslations:
     handler: src/apis/extract-translations.default
     events:
@@ -104,3 +112,6 @@ functions:
           path: /translations/{lang}
           method: POST
           cors: true
+  
+  dataApi:
+    handler: src/apis/private/data-api.default

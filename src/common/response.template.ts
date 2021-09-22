@@ -11,4 +11,4 @@ const template = {
 
 /** @deprecated */
 export const getResponseV2 = () =>  ( { ...template } as APIGatewayProxyStructuredResultV2 );
-export const getResponse = () =>  ( { ...template } as APIGatewayProxyResult );
+export const getResponse = ( overrides: Partial<APIGatewayProxyResult> = {} ) =>  ( { ...template, ...overrides } as APIGatewayProxyResult );

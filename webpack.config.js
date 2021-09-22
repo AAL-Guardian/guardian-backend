@@ -23,6 +23,7 @@ module.exports = {
     filename: '[name].js'
   },
   externals: [
+    // 'mysql'
     // not needed anymore? since webpack5 or serverless2.x?
     // nodeExternals({
     // whitelist: [

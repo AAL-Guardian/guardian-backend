@@ -123,6 +123,7 @@ provider:
             - "*"
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
+    stackName: ${self:service}
     stage: ${self:provider.stage}
     version: 0.0.1
     auroraSchema: ${self:custom.environments.${self:provider.stage}.schema, self:custom.environments.dev.schema}
