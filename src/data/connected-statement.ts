@@ -1,7 +1,7 @@
+import { ExecuteStatementResponse, SqlParameter } from '@aws-sdk/client-rds-data';
 import { Connection, createConnection } from 'mysql2/promise';
-import { SqlParameter, ExecuteStatementResponse, Field } from '@aws-sdk/client-rds-data';
-import { getDbSecret } from '../services/secret-manager';
 import { ConnectionOptions, OkPacket } from 'mysql2/typings/mysql';
+import { getDbSecret } from '../services/secret-manager';
 
 let connection: Connection;
 export async function executeStatement(sql: string, parameters: SqlParameter[] = []): Promise<ExecuteStatementResponse> {

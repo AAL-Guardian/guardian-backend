@@ -4,6 +4,7 @@ import { Assignment } from "./models/assignment.model";
 import { Client } from "./models/client.model";
 import { Robot } from "./models/robot.model";
 import dayjs = require("dayjs");
+import { Person } from "./models/person.model";
 
 export async function getRobotBySN(serial_number: string): Promise<Robot | undefined> {
   // const all = await executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
@@ -51,6 +52,24 @@ export async function insertRobot(serial_number: string, thing_name: string, top
     }
   ])
   return true;
+}
+
+export async function getPersonByRobotSN(serial_number: string): Promise<Person> {
+  const [ person ] = await executeStatement(`SELECT p.*
+  FROM clients c
+    JOIN robot_assignment ra on c.id = ra.clients_id
+      JOIN persons p ON p.id = c.person_id
+  WHERE ra.robot_serial_number = :serial_number
+  AND ra.is_active = true
+  AND current_timestamp BETWEEN ra.start_date AND IFNULL(ra.end_date, current_timestamp)`, [
+    {
+      name: 'serial_number',
+      value: {
+        stringValue: serial_number
+      }
+    }
+  ]) as Person[];
+  return person;
 }
 
 export async function getClientByRobotSN(serial_number: string): Promise<Client> {
@@ -193,4 +212,8 @@ export async function getRobotAssignmentById(assignmentId: number): Promise<Assi
     }
   }]);
   return list[0]
+}
+
+export async function getRobotCurrentLanguage(robotCode: string) {
+
 }

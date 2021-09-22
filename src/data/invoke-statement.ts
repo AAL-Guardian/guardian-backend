@@ -9,15 +9,15 @@ const lambdaOptions = {
 
 if (process.env.IS_OFFLINE === 'true') {
   lambdaOptions.credentials = fromIni({ profile: process.env.profile });
-  // lambdaOptions.region = process.env.AWS_REGION,
-  lambdaOptions.endpoint = 'http://localhost:3002';
-  // lambdaOptions.endpoint = async () => ({
-  //     hostname: `lambda.${lambdaOptions.region}.amazonaws.com`,
-  //     port: undefined,
-  //     protocol: 'https:',
-  //     path: '/',
-  //     query: undefined
-  //   })
+  lambdaOptions.region = process.env.AWS_REGION,
+  // lambdaOptions.endpoint = 'http://localhost:3002';
+  lambdaOptions.endpoint = async () => ({
+      hostname: `lambda.${lambdaOptions.region}.amazonaws.com`,
+      port: undefined,
+      protocol: 'https:',
+      path: '/',
+      query: undefined
+    })
 }
 const lambdaClient = new LambdaClient(lambdaOptions);
 

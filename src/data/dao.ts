@@ -1,5 +1,6 @@
 import { ExecuteStatementResponse, SqlParameter } from '@aws-sdk/client-rds-data';
 import { executeStatement as invokeStatement } from './invoke-statement';
+// import { executeStatement as connectedStatement } from './connected-statement';
 // import { executeStatement as dataApiStatement } from './data-api-statement';
 export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const DATE_FORMAT = 'YYYY-MM-DD'
@@ -7,7 +8,13 @@ export const DATE_FORMAT = 'YYYY-MM-DD'
 export async function executeStatement(sql: string, parameters?: SqlParameter[], mapResults = true): Promise<{ [key: string]: any }[] | ExecuteStatementResponse> {
   try {
     const start = Date.now();
-    const res = await invokeStatement(sql, parameters);
+    let res;
+    // if(process.env.IS_OFFLINE === 'true') {
+    //   res = await connectedStatement(sql, parameters);  
+    // } else {
+      res = await invokeStatement(sql, parameters);
+    // }
+    
     // const res = await dataApiStatement(sql, parameters);
     console.log('Statement Time: ' + (Date.now() - start));
 

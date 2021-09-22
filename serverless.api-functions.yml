@@ -36,6 +36,8 @@ functions:
           path: /report/{id}
           method: GET
           cors: true
+          authorizer: assignmentTokenAuthorizer
+
   recheckEvents:
     handler: src/apis/recheck-events.default
     events:

@@ -4,6 +4,7 @@ import { sendSpeakCommand } from "../iot/robot-commands";
 import logEvent from "../data/log-event";
 import { setShowDate } from "../data/report";
 import { ReportRequest } from "../data/models/report-request.model";
+import { getPersonByRobotSN } from "../data/robot";
 
 interface MyIotEvent {
   topic: string;
@@ -16,7 +17,7 @@ export default async function (event: MyIotEvent) {
   const eventType = event.event_type;
   const eventData = event.data;
   console.log(robotTopic, eventType, eventData);
-  const robots = await selectStatement('robot', [
+  const [ robot ] = await selectStatement('robot', [
     {
       name: 'topic',
       value: {
@@ -24,16 +25,16 @@ export default async function (event: MyIotEvent) {
       }
     }
   ]) as Robot[];
-  const robot = robots[0];
+  const person = await getPersonByRobotSN(robotTopic)
   await logEvent(robot.serial_number, 'senior_app_event', event);
   switch (eventType) {
     case 'showing_question':
       const question = event.data.description;
-      await sendSpeakCommand(robot, question, 'en');
+      await sendSpeakCommand(robot, question, person.language);
       break;
     case 'showing_message':
       const text = event.data.text;
-      await sendSpeakCommand(robot, text, 'en');
+      await sendSpeakCommand(robot, text, person.language);
       break;
     case 'showing_report':
       if(!event.data.id) {
