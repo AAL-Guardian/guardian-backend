@@ -45,12 +45,21 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
     client: pollyClient,
     params
   });
+  let volume = 100;
+  try {
+    volume = JSON.parse(robot.extra)?.volume;
+  } catch (e) {
+
+  }
 
   await iotData.send(new PublishCommand({
     topic: robot.topic  + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'speak_from_url',
-      guardian_data: url
+      guardian_data: {
+        url,
+        volume: Math.round(volume)
+      }
     }))
   }));
   

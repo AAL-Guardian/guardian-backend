@@ -1,12 +1,11 @@
-import { getRobotAssignment } from "../data/robot";
 import { selectStatement } from "../data/dao";
 import logEvent from "../data/log-event";
+import { Client } from "../data/models/client.model";
 import { ReportRequest } from "../data/models/report-request.model";
 import { ReportType } from "../data/models/report-type.model";
 import { Robot } from "../data/models/robot.model";
 import { elaborateQuestionAnswer, insertAnswer, insertSelfReportRequest } from "../data/report";
-import { Client } from "../data/models/client.model";
-import { sendSpeakCommand } from "../iot/robot-commands";
+import { getRobotAssignment } from "../data/robot";
 
 interface MyIotEvent {
   topic: string;
@@ -28,7 +27,7 @@ export default async function (event: MyIotEvent) {
   ]) as Robot[];
 
   await logEvent(robot.serial_number, 'senior_app_answer', event);
-  await sendSpeakCommand(robot, 'Thank you for this report', 'en');
+
   if (!reportRequest?.id) {
     const assignment = await getRobotAssignment(robot.serial_number);
     reportRequest = await insertSelfReportRequest(assignment.clients_id, reportSetup.id);

@@ -25,7 +25,7 @@ export default async function (event: MyIotEvent) {
       }
     }
   ]) as Robot[];
-  const person = await getPersonByRobotSN(robotTopic)
+  const person = await getPersonByRobotSN(robot.serial_number)
   await logEvent(robot.serial_number, 'senior_app_event', event);
   switch (eventType) {
     case 'showing_question':
