@@ -29,6 +29,7 @@ functions:
           path: /report/list
           method: GET
           cors: true
+          authorizer: assignmentTokenAuthorizer
   getReportSetup:
     handler: src/apis/get-report-setup.default
     events:

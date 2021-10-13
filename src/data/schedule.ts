@@ -49,6 +49,7 @@ export async function listFutureReportRequests(): Promise<ReportRequest[]> {
 export async function getPendingReportRequest(client_id?: string): Promise<ReportRequest[]> {
   const min_ago = dayjs().subtract(MIN_WINDOW_DIFF, 'minute').format(DATETIME_FORMAT);
   const end_min = dayjs().endOf('minute').format(DATETIME_FORMAT);
+  console.log(`checking events from ${min_ago} and ${end_min} for client: ${client_id}`);
   const res = await executeStatement(`SELECT * FROM report_request
   WHERE date_shown is null
     AND date_deleted is null
@@ -58,7 +59,7 @@ export async function getPendingReportRequest(client_id?: string): Promise<Repor
       name: 'client_id',
       value: {
         stringValue: client_id ? client_id : undefined,
-        isNull: client_id ? undefined : true
+        isNull: client_id === undefined ? true : undefined
       } as Field
     },
     {

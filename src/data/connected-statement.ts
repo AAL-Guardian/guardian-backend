@@ -20,7 +20,12 @@ export async function executeStatement(sql: string, parameters: SqlParameter[] =
       query = query.replace(/\:(\w+)/g, (txt, key) => {
         const value = values.find(one => one.name === key);
         if (value) {
-          return connection.escape(Object.values(value.value)[0]);
+          if(value.value.isNull) {
+            return 'null';
+          } else {
+            return connection.escape(Object.values(value.value)[0]);
+          }
+          
         }
         return txt;
       });
