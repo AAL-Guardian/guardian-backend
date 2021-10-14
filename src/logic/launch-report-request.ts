@@ -68,15 +68,30 @@ export async function checkUserAndLaunchReportRequest(id: string) {
         }
       }
     ]) as Person[]
-    
-    await sendSpeakCommand(robot, `Hey, ${person.name} are you there?`, 'en');
+    let message: string;
+    switch(person.language) {
+      case 'it':
+        message = `Hey ${person.name}, sei qui?`;
+        break;
+      case 'en':
+        message = `Hey ${person.name}, are you there?`;
+        break;
+      case 'fr':
+        message = `Salut ${person.name}, tu es là?`;
+        break;
+      case 'nl':
+        message = `Hé ${person.name}, ben je daar?`;
+        break;
+    }
+    await sendSpeakCommand(robot, message, person.language);
     /** wait 3 seconds */
     await new Promise(resolve => setTimeout(resolve, 2000) );
     await sendListenCommand(robot);
     return;
+  } else {
+    // launching request
+    await launchReportRequest(report_request);
   }
-  // launching request
-  await launchReportRequest(report_request);
 }
 
 export async function launchReportRequest(reportRequest: ReportRequest) {

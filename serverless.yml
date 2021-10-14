@@ -12,6 +12,7 @@ frameworkVersion: ^2.12.0
 configValidationMode: error
 
 custom:
+  logRetentionInDays: 60
   serverless-offline:
     AccountId: { Ref: AWS::AccountId }
   resources:
@@ -123,6 +124,7 @@ provider:
             - "*"
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     stackName: ${self:service}
     stage: ${self:provider.stage}
     version: 0.0.1
@@ -138,6 +140,7 @@ package:
   excludeDevDependencies: true
 
 plugins:
+  - serverless-plugin-log-retention
   - serverless-iam-roles-per-function
   - serverless-s3-local
   - serverless-webpack

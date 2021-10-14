@@ -15,30 +15,14 @@ export async function executeStatement(sql: string, parameters: SqlParameter[] =
       password: secret.password
     } as ConnectionOptions);
 
-    connection.config.queryFormat = (query, values: SqlParameter[]) => {
-      if (!values || values.length === 0) return query;
-      query = query.replace(/\:(\w+)/g, (txt, key) => {
-        const value = values.find(one => one.name === key);
-        if (value) {
-          if(value.value.isNull) {
-            return 'null';
-          } else {
-            return connection.escape(Object.values(value.value)[0]);
-          }
-          
-        }
-        return txt;
-      });
-      console.log(query);
-      return query;
-    };
+    connection.config.queryFormat = queryFormat;
   }
 
   // const values: { [keys: string]: any } = {};
   // for(let one of parameters) {
   //   values[one.name] = one.value;
   // }
-  const res = await connection.query(queryFormat(sql, parameters));
+  const res = await connection.query(sql, parameters);
 
   /** mapping per emulare RDS Data Service */
   return {
@@ -78,6 +62,9 @@ function queryFormat(query: string, values: SqlParameter[]) {
   query = query.replace(/\:(\w+)/g, (txt, key) => {
     const value = values.find(one => one.name === key);
     if (value) {
+      if(value.value.isNull) {
+        return 'null';
+      }
       return connection.escape(Object.values(value.value)[0]);
     }
     return txt;

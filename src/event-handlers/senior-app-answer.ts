@@ -42,4 +42,5 @@ export default async function (event: MyIotEvent) {
   ]) as Client[];
   const answerId = await insertAnswer(reportRequest.client_id, reportRequest.report_type_id, reportRequest.id, client.person_id);
   await elaborateQuestionAnswer(reportSetup.start_question, answerId);
+  // scheduleNextEvent();
 }
