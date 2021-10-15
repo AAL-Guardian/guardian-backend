@@ -54,7 +54,8 @@ export async function getPendingReportRequest(client_id?: string): Promise<Repor
   WHERE date_shown is null
     AND date_deleted is null
     AND client_id = IFNULL(:client_id, client_id)
-    AND date_scheduled BETWEEN :time_ago AND :end_time`, [
+    AND date_scheduled BETWEEN :time_ago AND :end_time
+    ORDER BY date_scheduled ASC`, [
     {
       name: 'client_id',
       value: {

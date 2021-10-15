@@ -10,6 +10,7 @@ service: guardian-backend
 useDotenv: true
 frameworkVersion: ^2.12.0
 configValidationMode: error
+variablesResolutionMode: 20210326
 
 custom:
   logRetentionInDays: 60
@@ -59,7 +60,6 @@ provider:
   region: eu-west-1
   memorySize: 1024
   timeout: 30
-  profile: ${opt:profile, env:profile}
   lambdaHashingVersion: "20201221"
   apiGateway:
     minimumCompressionSize: 1024
