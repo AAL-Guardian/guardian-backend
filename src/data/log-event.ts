@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
-import { DATETIME_FORMAT, insertStatement } from "./dao";
+import { DATETIME_FORMAT, executeStatement, insertStatement } from "./dao";
+import { MIN_WINDOW_DIFF } from "./schedule";
 
 export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | any = ""): Promise<void> {
   console.info('inserting log', robotCode, eventName, eventData);
@@ -33,4 +34,26 @@ export default async function logEvent(robotCode: string, eventName: string = ""
       }
     }
   ]);
+}
+
+export async function checkUserPresence(robotSerialNumber: string, minutesAgo = MIN_WINDOW_DIFF) {
+  //check if there was voice in the last minutes
+  const guardian_log = await executeStatement(`SELECT id
+  FROM guardian_event
+  WHERE event_name in ('voice_detected', 'senior_app_answer')
+  AND robot_serial_number = :robot_serial_number
+  AND timestamp >= :min_time`, [
+    {
+      name: 'robot_serial_number',
+      value: {
+        stringValue: robotSerialNumber
+      }
+    }, {
+      name: 'min_time',
+      value: {
+        stringValue: dayjs().subtract(minutesAgo, 'minute').format(DATETIME_FORMAT)
+      }
+    }
+  ]) as { [key: string]: any; }[];
+  return guardian_log.length > 0;
 }

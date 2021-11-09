@@ -8,12 +8,12 @@ import { ReportType } from "./models/report-type.model";
 import { Client } from "./models/client.model";
 
 export async function getReportSetup(report_type_id: number): Promise<ReportType> {
-  const [ report_type ] = await selectStatement<ReportType>('report_type', [{
+  const [report_type] = await selectStatement<ReportType>('report_type', [{
     name: 'id',
     value: { longValue: report_type_id }
   }]);
-  
-  const [ report_question ] = await executeStatement(
+
+  const [report_question] = await executeStatement(
     `SELECT rq.*
       FROM report_question rq
         LEFT JOIN report_question_followup rqf on rq.id = rqf.followup_question_id
@@ -27,8 +27,10 @@ export async function getReportSetup(report_type_id: number): Promise<ReportType
         }
       }
     ]) as ReportQuestion[];
-  report_type.start_question = report_question;
-  report_type.start_question.options = await getQuestionOptions(report_type.start_question.id, true);
+  if (report_question) {
+    report_type.start_question = report_question;
+    report_type.start_question.options = await getQuestionOptions(report_type.start_question.id, true);
+  }
   return report_type;
 }
 
@@ -287,7 +289,7 @@ export async function insertSelfReportRequest(client_id: string, report_type_id:
       }
     }
   ]);
-  const [ reportRequest ] = await selectStatement('report_request', [
+  const [reportRequest] = await selectStatement('report_request', [
     {
       name: 'id',
       value: {
