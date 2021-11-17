@@ -1,6 +1,7 @@
 import { IoTDataPlaneClient, PublishCommand } from "@aws-sdk/client-iot-data-plane";
 import { PollyClient, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
 import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
+import { getPutSignedUrl } from "../services/s3";
 import logEvent from "../data/log-event";
 import { Robot } from "../data/models/robot.model";
 
@@ -53,7 +54,7 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
   }
 
   await iotData.send(new PublishCommand({
-    topic: robot.topic  + '/command',
+    topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'speak_from_url',
       guardian_data: {
@@ -62,37 +63,69 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
       }
     }))
   }));
-  
-  await logEvent(robot.serial_number, 'sent_speak_command', { message, language, url });
-  
-} 
 
-export async function sendListenCommand(robot: Robot) {
-  await iotData.send(new PublishCommand({
-    topic: robot.topic  + '/command',
-    payload: (new TextEncoder()).encode(JSON.stringify({
-      guardian_command: 'record_audio',
-      guardian_data: null,
-    }))
-  }))
-  await logEvent(robot.serial_number, 'sent_listen_command');
+  await logEvent(robot.serial_number, 'sent_speak_command', { message, language, url });
+
 }
 
-
-export async function sendMoveHeadCommand(robot: Robot, angle: number) {
+export async function sendListenCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, time = 10) {
   await iotData.send(new PublishCommand({
-    topic: robot.topic  + '/command',
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'record_audio',
+      guardian_data: JSON.stringify({
+        upload_url: await getPutSignedUrl('detections/' + robot.serial_number + '_' + new Date().getTime() + '.base64'),
+        time
+      }),
+    }))
+  }))
+  await logEvent(robot.serial_number, 'record_audio');
+}
+
+export async function sendListenAnswerCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, time = 5) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'listen_answers',
+      guardian_data: {
+        upload_url: await getPutSignedUrl('answers/' + robot.serial_number + '_' + new Date().getTime() + '.base64'),
+        time
+      },
+    }))
+  }))
+  await logEvent(robot.serial_number, 'record_answer');
+}
+
+export async function sendPhotoCaptureCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, head_angle: number) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'take_photo',
+      guardian_data: {
+        upload_url: await getPutSignedUrl('photos/' + robot.serial_number + '_' + new Date().getTime() + '.jpg.base64'),
+        head_position: head_angle
+      },
+    }))
+  }))
+  await logEvent(robot.serial_number, 'take_photo');
+}
+
+export async function sendMoveHeadCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, angle: number) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'move_head',
-      guardian_data: angle,
+      guardian_data: {
+        angle
+      },
     }))
   }))
   await logEvent(robot.serial_number, 'moved_head', angle);
 }
 
-export async function sendEyeContactCommand(robot: Robot, status: 'sleep' | 'normal' | 'off') {
+export async function sendEyeContactCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, status: 'sleep' | 'normal' | 'off') {
   await iotData.send(new PublishCommand({
-    topic: robot.topic  + '/command',
+    topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'eye_contact',
       guardian_data: status,

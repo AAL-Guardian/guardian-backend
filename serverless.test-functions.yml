@@ -33,3 +33,20 @@ functions:
       - schedule:
           rate: cron(0/15 * ? * * *)
           enabled: true
+  testRobotCommands:
+    handler: src/apis/tests/send-command.default
+    events:
+      - http:
+          path: /test/send-command
+          method: POST
+          cors: true
+
+  testAudioTranscription:
+    handler: src/services/google-speech-text.default
+    layers:
+      - arn:aws:lambda:eu-west-1:278717594002:layer:ffmpeg:1
+    events:
+      - http:
+          path: /test/audio-transcription
+          method: POST
+          cors: true

@@ -1,13 +1,10 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
-import { S3Client } from "@aws-sdk/client-s3";
 import { S3Event } from "aws-lambda";
 
-const s3 = new S3Client({});
 const lambda = new LambdaClient({});
 
 if (process.env.IS_OFFLINE === 'true') {
   const credentials = require('@aws-sdk/credential-provider-ini').fromIni({ profile: process.env.profile });
-  s3.config.credentialDefaultProvider = credentials;
   lambda.config.credentialDefaultProvider = credentials;
 }
 

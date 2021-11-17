@@ -8,19 +8,14 @@ import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { promises } from 'fs';
 import { getResponse } from "../common/response.template";
 import logEvent from '../data/log-event';
-import shellExec = require('shell-exec');
 import { getRobotBySN, insertRobot } from '../data/robot';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import dayjs = require('dayjs');
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import shellExec = require('shell-exec');
 require('./../AmazonRootCA1.pem');
 
 const iot = new IoTClient({
   region: 'eu-west-1'
 });
-const s3 = new S3Client({
-  region: 'eu-west-1'
-})
+
 if (process.env.IS_OFFLINE === 'true') {
   iot.config.credentialDefaultProvider = require('@aws-sdk/credential-provider-ini').fromIni({ profile: process.env.profile })
 }
