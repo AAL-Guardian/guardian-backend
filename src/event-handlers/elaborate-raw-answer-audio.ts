@@ -24,12 +24,12 @@ export default async function (event: S3Event) {
     }
 
     const buffer = Buffer.from(chunks.join(), 'base64');
-    // const res = await getS3().send(new PutObjectCommand({
-    //   Bucket: one.s3.bucket.name,
-    //   Key: one.s3.object.key + '.wav',
-    //   ContentType: "audio/wav",
-    //   Body: buffer
-    // }));
+    const res = await getS3().send(new PutObjectCommand({
+      Bucket: one.s3.bucket.name,
+      Key: one.s3.object.key + '.wav',
+      ContentType: "audio/wav",
+      Body: buffer
+    }));
     console.log('sending audio to transcription');
     await sendBase64Audio(buffer);
   }));

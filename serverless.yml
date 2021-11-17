@@ -95,6 +95,7 @@ provider:
           Resource:
             - arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*
             - arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/db_connection-Zo919z
+            - arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/google-transcribe-key-zf62FY
         - Effect: Allow
           Action:
             - polly:*
