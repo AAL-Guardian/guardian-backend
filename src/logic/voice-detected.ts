@@ -2,7 +2,7 @@ import { getClientByRobotSN } from "../data/robot";
 import { getPendingReportRequest } from "../data/schedule";
 import { launchReportRequest } from "./launch-report-request";
 
-export async function voiceDetected(robot_id: string, timestamp: string) {
+export async function voiceDetected(robot_id: string) {
   const client = await getClientByRobotSN(robot_id);
   if(!client) {
     return;

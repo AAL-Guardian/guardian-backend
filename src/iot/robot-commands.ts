@@ -73,10 +73,10 @@ export async function sendListenCommand(robot: Pick<Robot, 'topic' | 'serial_num
     topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
       guardian_command: 'record_audio',
-      guardian_data: JSON.stringify({
+      guardian_data: {
         upload_url: await getPutSignedUrl('detections/' + robot.serial_number + '_' + new Date().getTime() + '.base64'),
         time
-      }),
+      },
     }))
   }))
   await logEvent(robot.serial_number, 'record_audio');

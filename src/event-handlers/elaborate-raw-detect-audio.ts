@@ -3,8 +3,6 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event, S3EventRecord } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
-import { getRobotBySN } from "../data/robot";
-import { sendMoveHeadCommand } from "../iot/robot-commands";
 import { voiceDetected } from "../logic/voice-detected";
 import { getS3 } from "../services/s3";
 
@@ -15,13 +13,13 @@ export default async function (event: S3Event) {
     await convertAudio(one);
     const presenceDetected = await detectVoice(one);
     if(presenceDetected.length > 0) {
-      const [sn, angle, timestamp] = one.s3.object.key.split('_');
-      await voiceDetected(sn, timestamp)
+      const [sn] = one.s3.object.key.split('/')[1].split('_');
+      await voiceDetected(sn)
 
-      const voiceAngle = await detectAngle(one, presenceDetected);
-      const headAngle = parseFloat(angle);
-      const rest = (voiceAngle + headAngle) % 360;
-      await sendMoveHeadCommand(await getRobotBySN(sn), rest);
+      // const voiceAngle = await detectAngle(one, presenceDetected);
+      // const headAngle = parseFloat(angle);
+      // const rest = (voiceAngle + headAngle) % 360;
+      // await sendMoveHeadCommand(await getRobotBySN(sn), rest);
     }
   }));
 }
@@ -30,7 +28,7 @@ export default async function (event: S3Event) {
 async function convertAudio(one: S3EventRecord) {
   try {
     // convert audio file to wav
-    const [robot, angle, timestamp] = one.s3.object.key.split('_', 3);
+    const [robot] = one.s3.object.key.split('/')[1].split('_');
     await logEvent(robot, 'robot_file_upload', { filename: one.s3.object.key });
     const data = await getS3().send(new GetObjectCommand({
       Bucket: one.s3.bucket.name,
@@ -71,10 +69,9 @@ async function detectVoice(one: S3EventRecord) {
     const seg = JSON.parse(responseObj.seg);
     const hasMaleOrFemale = seg.filter(([who, start, end]) => ['male', 'female'].includes(who));
     if (hasMaleOrFemale.length > 0) {
-      const [sn, angle, timestamp] = one.s3.object.key.split('_');
+      const [sn ] = one.s3.object.key.split('/')[1].split('_');
       await logEvent(sn, 'voice_detected', JSON.stringify({
-        seg,
-        angle
+        seg
       }));
       return hasMaleOrFemale;
     }

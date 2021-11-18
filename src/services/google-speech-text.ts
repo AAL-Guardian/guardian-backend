@@ -112,7 +112,7 @@ export async function sendBase64Audio(base64content: Buffer, languageCode = 'it-
     model: "command_and_search",
     useEnhanced: true,
     speechContexts: [{
-      phrases: positiveAnswers[languageCode] + negativeAnswers[languageCode],
+      phrases: [...positiveAnswers[languageCode], ...negativeAnswers[languageCode]],
       boost: 15
     } as any],
     metadata: {
@@ -134,15 +134,17 @@ export async function sendBase64Audio(base64content: Buffer, languageCode = 'it-
     console.log(response);
     const words = response.results
       .map(result => result.alternatives[0].transcript.split(' '))
-      .reduce((acc, one) => [ ...acc, ...one ], []);
+      .reduce((acc, one) => [...acc, ...one], [])
+      .map(one => one.trim());
 
     console.log(words);
-    const positive = words.some(word => positiveAnswers[languageCode].find(word));
-    const negative = words.some(word => negativeAnswers[languageCode].find(word));
-
-    if(positive && !negative) {
+    const positive = words.some(word => positiveAnswers[languageCode].find((one: string) => one === word));
+    const negative = words.some(word => negativeAnswers[languageCode].find((one: string) => one === word));
+    console.log('positive', positive);
+    console.log('negative', negative);
+    if (positive && !negative) {
       return true;
-    } else if(!positive && negative) {
+    } else if (!positive && negative) {
       return false
     } else {
       return undefined;
