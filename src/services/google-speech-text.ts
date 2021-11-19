@@ -138,8 +138,8 @@ export async function sendBase64Audio(base64content: Buffer, languageCode = 'it-
       .map(one => one.trim());
 
     console.log(words);
-    const positive = words.some(word => positiveAnswers[languageCode].find((one: string) => one === word));
-    const negative = words.some(word => negativeAnswers[languageCode].find((one: string) => one === word));
+    const positive = words.some(word => positiveAnswers[languageCode].find((one: string) => one.toLocaleLowerCase() === word.toLocaleLowerCase()));
+    const negative = words.some(word => negativeAnswers[languageCode].find((one: string) => one.toLocaleLowerCase() === word.toLocaleLowerCase()));
     console.log('positive', positive);
     console.log('negative', negative);
     if (positive && !negative) {
