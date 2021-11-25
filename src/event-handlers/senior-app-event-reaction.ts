@@ -5,20 +5,33 @@ import { ReportRequest } from "../data/models/report-request.model";
 import { Robot } from "../data/models/robot.model";
 import { setShowDate } from "../data/report";
 import { getPersonByRobotSN } from "../data/robot";
-import { sendSpeakCommand } from "../iot/robot-commands";
+import { sendListenAnswerCommand, sendSpeakCommand } from "../iot/robot-commands";
+import { ReportQuestion } from "../data/models/report-question.model";
 
-interface MyIotEvent {
+interface AbstractIotEvent {
   topic: string;
-  [key: string]: any;
+  robot_topic: string;
+  event_type: string;
+  data: any;
 }
 
-export default async function (event: MyIotEvent) {
+interface ShowingQuestionEvent extends AbstractIotEvent {
+  topic: 'showing_question';
+  data: {
+    reportQuestion: ReportQuestion,
+    askYesNo: boolean
+  }
+}
+
+interface AnyIotEvent extends AbstractIotEvent { }
+
+export default async function (event: ShowingQuestionEvent | AnyIotEvent) {
   console.log('logging senior app event', event);
   const robotTopic = event.robot_topic;
   const eventType = event.event_type;
   const eventData = event.data;
   console.log(robotTopic, eventType, eventData);
-  const [ robot ] = await selectStatement('robot', [
+  const [robot] = await selectStatement('robot', [
     {
       name: 'topic',
       value: {
@@ -32,9 +45,13 @@ export default async function (event: MyIotEvent) {
       await handleSeniorAppInteraction(robot);
       break;
     case 'showing_question': {
-      const question = event.data.description;
+      const question = (event as ShowingQuestionEvent).data.reportQuestion;
       const person = await getPersonByRobotSN(robot.serial_number)
-      await sendSpeakCommand(robot, question, person.language);
+      await sendSpeakCommand(robot, question.description, person.language);
+      if(event.data.askYesNo) {
+        setTimeout(async () => await sendListenAnswerCommand(robot), 3000);
+      }
+      
       break;
     }
     case 'showing_message': {
@@ -44,7 +61,7 @@ export default async function (event: MyIotEvent) {
       break;
     }
     case 'showing_report':
-      if(!event.data.id) {
+      if (!event.data.id) {
         console.log('autonomus request, no need to update');
         return;
       }
