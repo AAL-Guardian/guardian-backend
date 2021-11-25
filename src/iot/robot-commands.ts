@@ -133,3 +133,14 @@ export async function sendEyeContactCommand(robot: Pick<Robot, 'topic' | 'serial
   }))
   await logEvent(robot.serial_number, 'eye_contact', status);
 }
+
+export async function sendChangeLedCommand(robot: Pick<Robot, 'topic' | 'serial_number'>) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'change_led',
+      guardian_data: undefined,
+    }))
+  }))
+  await logEvent(robot.serial_number, 'change_led');
+}

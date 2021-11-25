@@ -1,15 +1,14 @@
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event } from "aws-lambda";
-import { getRobotBySN } from "../data/robot";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
-import { sendAnswerDetectedEvent } from "../iot/cloud-events";
 import { sendBase64Audio } from "../services/google-speech-text";
+import { handleAnswerDetected } from "../logic/guardian-event-logic";
 import { getS3 } from "../services/s3";
 
 export default async function (event: S3Event) {
   await Promise.all(event.Records.map(async one => {
-    const [ robot_code ] = one.s3.object.key.split('/')[1].split('_');
+    const [robot_code] = one.s3.object.key.split('/')[1].split('_');
     await logEvent(robot_code, 'robot_file_upload', { filename: one.s3.object.key });
 
     const data = await getS3().send(new GetObjectCommand({
@@ -35,9 +34,7 @@ export default async function (event: S3Event) {
     const res = await sendBase64Audio(buffer);
     console.log('answer: ', res);
     if (res === true || res === false) {
-      await logEvent(robot_code, 'robot_detected_answer', { answer: res });
-      const robot = await getRobotBySN(robot_code);
-      await sendAnswerDetectedEvent(robot, res);
+      await handleAnswerDetected(robot_code, res);
     }
   }));
 }

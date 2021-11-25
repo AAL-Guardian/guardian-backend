@@ -34,22 +34,7 @@ functions:
           rules:
             - suffix: .base64
             - prefix: photos/
-  # audioSignalReaction:
-  #   handler: src/event-handlers/audio-signal-reaction.default
-  #   events:
-  #     - s3:
-  #         bucket: ${self:custom.resources.audioBucket}
-  #         event: s3:ObjectCreated:*
-  #         existing: true
-  #         rules:
-  #           - suffix: .base64
-  # elaborateSchedulerEvent:
-  #   handler: src/event-handlers/scheduler-event-changed.default
-  #   events:
-  #     - stream:
-  #         type: dynamodb
-  #         arn:
-  #           Fn::GetAtt: [schedulerTable, StreamArn]
+
   elaborateSchedulerRatioEvent:
     handler: src/event-handlers/scheduler-event-ratio.default
     events:

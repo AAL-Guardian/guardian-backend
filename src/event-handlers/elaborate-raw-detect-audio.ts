@@ -3,28 +3,23 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event, S3EventRecord } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
-import { voiceDetected } from "../logic/voice-detected";
+import { handleVoiceDetected } from "../logic/guardian-event-logic";
 import { getS3 } from "../services/s3";
 
 const lambda = new LambdaClient({});
 
 export default async function (event: S3Event) {
   await Promise.all(event.Records.map(async one => {
-    await convertAudio(one);
-    const presenceDetected = await detectVoice(one);
-    if(presenceDetected.length > 0) {
-      const [sn] = one.s3.object.key.split('/')[1].split('_');
-      await voiceDetected(sn)
-
-      // const voiceAngle = await detectAngle(one, presenceDetected);
-      // const headAngle = parseFloat(angle);
-      // const rest = (voiceAngle + headAngle) % 360;
-      // await sendMoveHeadCommand(await getRobotBySN(sn), rest);
-    }
+    const [sn] = one.s3.object.key.split('/')[1].split('_');
+    await detectVoice(one, sn);
+    // await convertAudio(one);
   }));
 }
 
-
+/**
+ * @deprecated
+ * @param one S3EventRecord
+ */
 async function convertAudio(one: S3EventRecord) {
   try {
     // convert audio file to wav
@@ -52,7 +47,7 @@ async function convertAudio(one: S3EventRecord) {
   }
 }
 
-async function detectVoice(one: S3EventRecord) {
+async function detectVoice(one: S3EventRecord, robot_code: string) {
   try {
     //handle event audio
     console.log('ill invoke Alexandre voices');
@@ -69,11 +64,8 @@ async function detectVoice(one: S3EventRecord) {
     const seg = JSON.parse(responseObj.seg);
     const hasMaleOrFemale = seg.filter(([who, start, end]) => ['male', 'female'].includes(who));
     if (hasMaleOrFemale.length > 0) {
-      const [sn ] = one.s3.object.key.split('/')[1].split('_');
-      await logEvent(sn, 'voice_detected', JSON.stringify({
-        seg
-      }));
-      return hasMaleOrFemale;
+      await handleVoiceDetected(robot_code);
+      return true;
     }
   } catch (e) {
     console.log(e);
@@ -86,7 +78,7 @@ async function detectAngle(one: S3EventRecord, presenceOutput: [string, number, 
     //handle event audio
     console.log('ill invoke Alexandre angle');
     const window = presenceOutput.filter(([who, start, end]) => ['male', 'female'].includes(who)).pop()
-    
+
     const visualization = await lambda.send(new InvokeCommand({
       FunctionName: 'gardian-angle',
       Payload: (new TextEncoder()).encode(JSON.stringify({

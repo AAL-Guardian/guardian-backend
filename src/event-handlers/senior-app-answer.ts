@@ -7,6 +7,7 @@ import { ReportType } from "../data/models/report-type.model";
 import { Robot } from "../data/models/robot.model";
 import { elaborateQuestionAnswer, insertAnswer, insertSelfReportRequest } from "../data/report";
 import { getRobotAssignment } from "../data/robot";
+import { handleSeniorAppInteraction } from "../logic/guardian-event-logic";
 
 interface MyIotEvent {
   topic: string;
@@ -28,7 +29,7 @@ export default async function (event: MyIotEvent) {
   ]) as Robot[];
 
   await logEvent(robot.serial_number, 'senior_app_answer', event);
-
+  await handleSeniorAppInteraction(robot);
   if (!reportRequest?.id) {
     const assignment = await getRobotAssignment(robot.serial_number);
     reportRequest = await insertSelfReportRequest(assignment.clients_id, reportSetup.id);

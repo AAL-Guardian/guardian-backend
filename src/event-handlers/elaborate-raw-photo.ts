@@ -10,11 +10,10 @@ export default async function (event: S3Event) {
   }));
 }
 
-
 async function convertPhoto(one: S3EventRecord) {
   try {
     // convert audio file to wav
-    const [ robot_code ] = one.s3.object.key.split('/')[1].split('_');
+    const [robot_code] = one.s3.object.key.split('/')[1].split('_');
     await logEvent(robot_code, 'robot_file_upload', { filename: one.s3.object.key });
     const data = await getS3().send(new GetObjectCommand({
       Bucket: one.s3.bucket.name,
