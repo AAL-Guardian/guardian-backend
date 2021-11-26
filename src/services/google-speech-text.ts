@@ -87,6 +87,10 @@ const positiveAnswers = {
     'Bene',
     'Ottimo',
     'Sine'
+  ],
+  'nl-NL': [
+    'Yes',
+    'Ja'
   ]
 }
 
@@ -95,6 +99,10 @@ const negativeAnswers = {
     'No',
     'Male',
     'None'
+  ],
+  'nl-NL': [
+    'Nee',
+    'No'
   ]
 }
 
