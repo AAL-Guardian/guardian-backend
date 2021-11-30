@@ -89,8 +89,12 @@ const positiveAnswers = {
     'Sine'
   ],
   'nl-NL': [
-    'Yes',
-    'Ja'
+    'Ja',
+    'Jazeker',
+    'Ja hoor',
+    'Inderdaad',
+    'Oké',
+    'Wel'
   ]
 }
 
@@ -102,7 +106,9 @@ const negativeAnswers = {
   ],
   'nl-NL': [
     'Nee',
-    'No'
+    'Nee hoor',
+    'Niet',
+    'Geen'
   ]
 }
 

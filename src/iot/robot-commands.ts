@@ -1,5 +1,5 @@
 import { IoTDataPlaneClient, PublishCommand } from "@aws-sdk/client-iot-data-plane";
-import { PollyClient, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
+import { PollyClient, SynthesizeSpeechCommand, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
 import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
 import { getPutSignedUrl } from "../services/s3";
 import logEvent from "../data/log-event";
@@ -42,6 +42,7 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
       params.Engine = 'standard';
       break;
   }
+
   const url = await getSynthesizeSpeechUrl({
     client: pollyClient,
     params

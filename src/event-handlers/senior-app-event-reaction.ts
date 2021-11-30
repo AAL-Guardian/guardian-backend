@@ -49,7 +49,8 @@ export default async function (event: ShowingQuestionEvent | AnyIotEvent) {
       const person = await getPersonByRobotSN(robot.serial_number)
       await sendSpeakCommand(robot, question.description, person.language);
       if(event.data.askYesNo) {
-        setTimeout(async () => await sendListenAnswerCommand(robot), 3000);
+        await new Promise((resolve, reject) => setTimeout(resolve, 4000));
+        await sendListenAnswerCommand(robot)
       }
       
       break;
