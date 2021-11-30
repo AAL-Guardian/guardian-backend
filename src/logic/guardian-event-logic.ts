@@ -1,11 +1,10 @@
-import { Robot } from "../data/models/robot.model";
 import logEvent from "../data/log-event";
-import { getRobotBySN } from "../data/robot";
-import { sendAnswerDetectedEvent } from "../iot/cloud-events";
-import { getClientByRobotSN } from "../data/robot";
+import { Robot } from "../data/models/robot.model";
+import { getClientByRobotSN, getRobotBySN } from "../data/robot";
 import { getPendingReportRequest } from "../data/schedule";
-import { launchReportRequest } from "./launch-report-request";
+import { sendAnswerDetectedEvent } from "../iot/cloud-events";
 import { sendChangeLedCommand } from "../iot/robot-commands";
+import { launchReportRequest } from "./launch-report-request";
 
 export async function handleVoiceDetected(robot_code: Robot['serial_number']) {
   const client = await getClientByRobotSN(robot_code);
@@ -26,12 +25,11 @@ export async function handleVoiceDetected(robot_code: Robot['serial_number']) {
 export async function handleSeniorAppInteraction(robot: Robot) {
   await Promise.all([
     logEvent(robot.serial_number, 'senior_interaction_detected'),
-    sendChangeLedCommand(robot)
+    sendChangeLedCommand(robot),
   ])
 }
 
 export async function handleAnswerDetected(robot_code: Robot['serial_number'], res: boolean) {
-  
   const robot = await getRobotBySN(robot_code);
   await Promise.all([
     logEvent(robot_code, 'robot_detected_answer', { answer: res }),
