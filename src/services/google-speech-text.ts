@@ -89,6 +89,7 @@ const positiveAnswers = {
     'Sine'
   ],
   'nl-NL': [
+    'Jà',
     'Ja',
     'Jazeker',
     'Ja hoor',
@@ -112,8 +113,26 @@ const negativeAnswers = {
   ]
 }
 
-export async function sendBase64Audio(base64content: Buffer, languageCode = 'it-IT'): Promise<boolean | undefined> {
-
+export async function sendBase64Audio(base64content: Buffer, language: string): Promise<boolean | undefined> {
+  let languageCode: 'it-IT' | 'en-GB' | 'nl-NL' | 'fr-FR';
+  switch (language) {
+    case 'it':
+    case 'it-IT':
+      languageCode = 'it-IT';
+      break;
+    case 'en':
+    case 'en-GB':
+      languageCode = 'en-GB';
+      break;
+    case 'nl':
+    case 'nl-NL':
+      languageCode = 'nl-NL';
+      break;
+    case 'fr':
+    case 'fr-FR':
+      languageCode = 'fr-FR';
+      break;
+  }
   const client = await getSpeechClient();
   const audio: google.cloud.speech.v1.IRecognitionAudio = {
     content: base64content

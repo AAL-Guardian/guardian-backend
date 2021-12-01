@@ -5,6 +5,7 @@ import logEvent from "../data/log-event";
 import { sendBase64Audio } from "../services/google-speech-text";
 import { handleAnswerDetected } from "../logic/guardian-event-logic";
 import { getS3 } from "../services/s3";
+import { getPersonByRobotSN } from "../data/robot";
 
 export default async function (event: S3Event) {
   await Promise.all(event.Records.map(async one => {
@@ -31,7 +32,9 @@ export default async function (event: S3Event) {
       Body: buffer
     }));
     console.log('sending audio to transcription');
-    const res = await sendBase64Audio(buffer);
+    
+    const person = await getPersonByRobotSN(robot_code);
+    const res = await sendBase64Audio(buffer, person.language);
     console.log('answer: ', res);
     if (res === true || res === false) {
       await handleAnswerDetected(robot_code, res);
