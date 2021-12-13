@@ -82,6 +82,14 @@ functions:
           cors: true
           authorizer: assignmentTokenAuthorizer
   
+  getSkillsMeta:
+    handler: src/apis/skills-meta.default
+    events:
+      - http:
+          path: /robot/skills
+          method: GET
+          cors: true
+  
   getTodayAppointments:
     handler: src/apis/get-today-appointments.default
     events:
