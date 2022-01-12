@@ -35,12 +35,13 @@ export default async function (event: APIGatewayEvent) {
     policy: CreatePolicyResponse;
 
   const thingName =  'misty_' + process.env.stage + '-' + robot;
+  const policyName =  'misty-policy-' + process.env.stage + '-' + robot;
   try {
     thing = await iot.send(new DescribeThingCommand({
       thingName
     }));
     policy = await iot.send(new GetPolicyCommand({
-      policyName: 'misty-policy-' + process.env.stage + '-' + robot,
+      policyName
     }));
   } catch (e) {
     console.log(e)
@@ -51,7 +52,9 @@ export default async function (event: APIGatewayEvent) {
       thingName
     }));
     const group = await iot.send(new AddThingToThingGroupCommand({ thingName: thing.thingName, thingGroupName: 'Guardian' }));
-    policy = await createPolicy(robot)
+  }
+  if(!policy?.policyName) {
+    policy = await createPolicy(robot, policyName)
   }
 
   const cert = await iot.send(new CreateKeysAndCertificateCommand({
@@ -101,10 +104,10 @@ export default async function (event: APIGatewayEvent) {
   return response;
 }
 
-async function createPolicy(robotCode: string) {
+async function createPolicy(robotCode: string, policyName: string) {
   const baseArn = `arn:aws:iot:eu-west-1:*`;
   return await iot.send(new CreatePolicyCommand({
-    policyName: 'misty-policy-' + robotCode,
+    policyName: policyName,
     policyDocument: JSON.stringify({
       Version: "2012-10-17",
       Statement: [
