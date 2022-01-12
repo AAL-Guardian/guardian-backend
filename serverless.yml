@@ -46,7 +46,7 @@ custom:
     contentCompression: 100 # Minimum body size required for compression in bytes# Targeted usage percentage
   environments:
     prod:
-      secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:rds-db-credentials/cluster-Y3VSICFR3ZA5XDXBW6TDARMYCY/admin-rmDDNd
+      secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:prod/db_connection-OVaM67
       schema: guardian
     dev:
       secretArn: arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/db_connection-Zo919z
@@ -95,6 +95,7 @@ provider:
           Resource:
             - arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*
             - arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/db_connection-Zo919z
+            - arn:aws:secretsmanager:eu-west-1:278717594002:secret:prod/db_connection-OVaM67
             - arn:aws:secretsmanager:eu-west-1:278717594002:secret:dev/google-transcribe-key-zf62FY
         - Effect: Allow
           Action:
