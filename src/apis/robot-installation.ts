@@ -34,12 +34,13 @@ export default async function (event: APIGatewayEvent) {
   let thing: DescribeThingCommandOutput | CreateThingCommandOutput,
     policy: CreatePolicyResponse;
 
+  const thingName =  'misty_' + process.env.stage + '-' + robot;
   try {
     thing = await iot.send(new DescribeThingCommand({
-      thingName: 'misty-' + robot
+      thingName
     }));
     policy = await iot.send(new GetPolicyCommand({
-      policyName: 'misty-policy-' + robot,
+      policyName: 'misty-policy-' + process.env.stage + '-' + robot,
     }));
   } catch (e) {
     console.log(e)
@@ -47,7 +48,7 @@ export default async function (event: APIGatewayEvent) {
 
   if (!thing?.thingId) {
     thing = await iot.send(new CreateThingCommand({
-      thingName: 'misty-' + robot
+      thingName
     }));
     const group = await iot.send(new AddThingToThingGroupCommand({ thingName: thing.thingName, thingGroupName: 'Guardian' }));
     policy = await createPolicy(robot)
