@@ -45,21 +45,21 @@ functions:
     handler: src/event-handlers/senior-app-event-reaction.default
     events:
       - iot:
-          sql: "SELECT * as data, topic(1) as robot_topic, topic(4) as event_type FROM '+/senior-app/events/+' WHERE startswith(topic(1), ${self:provider.stage}) = true"
+          sql: "SELECT * as data, topic(1) as robot_topic, topic(4) as event_type FROM '+/senior-app/events/+' WHERE startswith(topic(1), 'misty_${self:provider.stage}'') = true"
           enabled: true
           sqlVersion: '2016-03-23'
   seniorAppAnswer:
     handler: src/event-handlers/senior-app-answer.default
     events:
       - iot:
-          sql: "SELECT reportRequest, reportSetup, topic(1) as robot_topic FROM '+/senior-app/answer' WHERE startswith(topic(1), ${self:provider.stage}) = true"
+          sql: "SELECT reportRequest, reportSetup, topic(1) as robot_topic FROM '+/senior-app/answer' WHERE startswith(topic(1), 'misty_${self:provider.stage}'') = true"
           enabled: true
           sqlVersion: '2016-03-23'
   robotEventHandler:
     handler: src/event-handlers/robot-event-reaction.default
     events:
       - iot:
-          sql: "SELECT * as data, topic(1) as robot_topic FROM '+/event' WHERE startswith(topic(1), ${self:provider.stage}) = true"
+          sql: "SELECT * as data, topic(1) as robot_topic FROM '+/event' WHERE startswith(topic(1), 'misty_${self:provider.stage}'') = true"
           enabled: true
           sqlVersion: '2016-03-23'
   periodicListeningAction:
