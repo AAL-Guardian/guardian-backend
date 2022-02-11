@@ -8,9 +8,7 @@
 service: guardian-backend
 
 useDotenv: true
-frameworkVersion: ^2.12.0
-configValidationMode: error
-variablesResolutionMode: 20210326
+frameworkVersion: ^3
 
 custom:
   logRetentionInDays: 60
@@ -25,11 +23,11 @@ custom:
     # schedulerTableArn: { Fn::GetAtt: [ "${self:custom.resources.schedulerTable}", Arn] }
     # audioBucket: { Ref: audioBucket }
     auroraDB:
-    #   Name: guardiandb-${self:provider.stage}
+      #   Name: guardiandb-${self:provider.stage}
       Name: guardian-db
       Arn:
         Fn::Join:
-          - ':'
+          - ":"
           - - arn:aws:rds
             - ${self:provider.region}
             - 278717594002
@@ -37,8 +35,8 @@ custom:
             # - ${self:custom.resources.AccountId}
             - cluster:${self:custom.resources.auroraDB.Name}
   webpack:
-    includeModules: true   # Node modules configuration for packaging
-    packager: 'npm'   # Packager that will be used to package your external modules
+    includeModules: true # Node modules configuration for packaging
+    packager: "npm" # Packager that will be used to package your external modules
   s3:
     host: localhost
     directory: ./.s3-local
@@ -60,7 +58,7 @@ provider:
   region: eu-west-1
   memorySize: 1024
   timeout: 30
-  lambdaHashingVersion: "20201221"
+  versionFunctions: false
   apiGateway:
     minimumCompressionSize: 1024
     shouldStartNameWithService: true
@@ -121,7 +119,7 @@ provider:
           Action:
             - events:DescribeRule
             - events:PutRule
-            - events:ListRules 
+            - events:ListRules
           Resource:
             - "*"
   # this is needed to connect to RDS but it breaks other AWS services
@@ -147,7 +145,7 @@ plugins:
   - serverless-s3-local
   - serverless-webpack
   - serverless-offline
-  
+
 functions:
   - ${file(./serverless.api-functions.yml):functions}
   - ${file(./serverless.listener-functions.yml):functions}
@@ -172,6 +170,13 @@ resources:
                 - "*"
               AllowedHeaders:
                 - "*"
+    # iotAuthorizer:
+    #   Type: AWS::IoT::Authorizer
+    #   Properties:
+    #     AuthorizerFunctionArn: arn:aws:lambda:${self:provider.region}:278717594002:function:${self:service}-${self:provider.stage}-iotTokenAuthorizer
+    #     AuthorizerName: GuardianIotAuthorizer-${self:provider.stage}
+    #     SigningDisabled: false
+    #     Status: ACTIVE
     # schedulerTable:
     #   Type: AWS::DynamoDB::Table
     #   Properties:
@@ -195,4 +200,4 @@ resources:
     #         AttributeName: eventId
     #         KeyType: RANGE
     #     StreamSpecification:
-    #       StreamViewType: OLD_IMAGE 
+    #       StreamViewType: OLD_IMAGE

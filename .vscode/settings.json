@@ -24,5 +24,11 @@
       "username": "admin",
       "password": "guardian"
     }
-  ]
+  ],
+  "yaml.schemas": {
+    "file:///c%3A/Users/tdlem/.vscode/extensions/atlassian.atlascode-2.10.7/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "https://raw.githubusercontent.com/lalcebo/json-schema/master/serverless/reference.json": [
+      "file:///c%3A/Users/tdlem/Projects/Jef/Guardian/guardian-backend/serverless.yml"
+    ]
+  }
 }
