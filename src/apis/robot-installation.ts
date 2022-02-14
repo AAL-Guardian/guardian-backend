@@ -54,7 +54,7 @@ export default async function (event: APIGatewayEvent) {
     const group = await iot.send(new AddThingToThingGroupCommand({ thingName: thing.thingName, thingGroupName: 'Guardian' }));
   }
   if(!policy?.policyName) {
-    policy = await createPolicy(robot, policyName)
+    policy = await createPolicy(thingName, policyName)
   }
 
   const cert = await iot.send(new CreateKeysAndCertificateCommand({
@@ -104,7 +104,7 @@ export default async function (event: APIGatewayEvent) {
   return response;
 }
 
-async function createPolicy(robotCode: string, policyName: string) {
+async function createPolicy(thingName: string, policyName: string) {
   const baseArn = `arn:aws:iot:eu-west-1:*`;
   return await iot.send(new CreatePolicyCommand({
     policyName: policyName,
@@ -123,29 +123,14 @@ async function createPolicy(robotCode: string, policyName: string) {
         {
           Effect: "Allow",
           Action: [
-            "iot:Subscribe",
+            "iot:*",
           ],
           Resource: [
+            // `${baseArn}:topicfilter/${thingName}*`,
+            // `${baseArn}:topic/${thingName}*`,
+            // `${baseArn}:thing/${thingName}*`,
             `${baseArn}:topicfilter/*`,
-          ]
-        },
-        {
-          Effect: "Allow",
-          Action: [
-            "iot:Publish",
-            "iot:Receive"
-          ],
-          Resource: [
             `${baseArn}:topic/*`,
-          ]
-        },
-        {
-          Effect: "Allow",
-          Action: [
-            "iot:UpdateThingShadow",
-            "iot:GetThingShadow"
-          ],
-          Resource: [
             `${baseArn}:thing/*`,
           ]
         }
