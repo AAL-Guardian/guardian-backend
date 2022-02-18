@@ -6,9 +6,10 @@ import { sendBase64Audio } from "../services/google-speech-text";
 import { handleAnswerDetected } from "../logic/guardian-event-logic";
 import { getS3 } from "../services/s3";
 import { getPersonByRobotSN } from "../data/robot";
+import { detectEmotion } from '../services/alex';
 
 export default async function (event: S3Event) {
-  await Promise.all(event.Records.map(async one => {
+  await Promise.allSettled(event.Records.map(async one => {
     const [robot_code] = one.s3.object.key.split('/')[1].split('_');
     await logEvent(robot_code, 'robot_file_upload', { filename: one.s3.object.key });
 
@@ -38,6 +39,7 @@ export default async function (event: S3Event) {
     console.log('answer: ', res);
     if (res === true || res === false) {
       await handleAnswerDetected(robot_code, res);
+      await detectEmotion(one, robot_code , 'answer')
     }
   }));
 }

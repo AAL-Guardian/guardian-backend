@@ -6,7 +6,7 @@ import { Person } from "../data/models/person.model";
 import { ReportRequest } from "../data/models/report-request.model";
 import { getRobotAssignment, getRobotBySN } from "../data/robot";
 import { getPendingReportRequest, getReportRequestById } from "../data/schedule";
-import { sendListenCommand, sendSpeakCommand } from "../iot/robot-commands";
+import { sendListenCommand, sendPhotoCaptureCommand, sendSpeakCommand } from "../iot/robot-commands";
 import { sendReportRequest } from "../iot/senior-app-commands";
 
 export async function checkUserAndLaunchReportRequest(id: string) {
@@ -66,6 +66,7 @@ export async function checkUserAndLaunchReportRequest(id: string) {
         break;
     }
     await sendSpeakCommand(robot, message, person.language);
+    await sendPhotoCaptureCommand(robot, 0);
     /** wait 3 seconds */
     await new Promise(resolve => setTimeout(resolve, 2000));
     await sendListenCommand(robot);

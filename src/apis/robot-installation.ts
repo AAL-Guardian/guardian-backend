@@ -126,12 +126,12 @@ async function createPolicy(thingName: string, policyName: string) {
             "iot:*",
           ],
           Resource: [
-            // `${baseArn}:topicfilter/${thingName}*`,
-            // `${baseArn}:topic/${thingName}*`,
+            `${baseArn}:topicfilter/${thingName}*`,
+            `${baseArn}:topic/${thingName}*`,
             // `${baseArn}:thing/${thingName}*`,
-            `${baseArn}:topicfilter/*`,
-            `${baseArn}:topic/*`,
-            `${baseArn}:thing/*`,
+            // `${baseArn}:topicfilter/*`,
+            // `${baseArn}:topic/*`,
+            // `${baseArn}:thing/*`,
           ]
         }
       ]
