@@ -172,17 +172,21 @@ resources:
                 - "*"
     iotAuthorizer:
       Type: AWS::IoT::Authorizer
+      DependsOn: [IotTokenAuthorizerLambdaFunction]
       Properties:
-        AuthorizerFunctionArn: { "Fn::GetAtt": ["iotTokenAuthorizer", "Arn" ] }
+        AuthorizerFunctionArn: { "Fn::GetAtt": [IotTokenAuthorizerLambdaFunction, "Arn"] }
         AuthorizerName: GuardianIotAuthorizer-${self:provider.stage}
         SigningDisabled: true
         Status: ACTIVE
-    iotAuthorizerPermission:    
+    iotAuthorizerPermission:
+      DependsOn: [IotTokenAuthorizerLambdaFunction, iotAuthorizer]
       Type: AWS::Lambda::Permission
       Properties:
-        FunctionName: { "Fn::GetAtt": ["iotTokenAuthorizer", "Arn" ] }
+        FunctionName: { "Fn::GetAtt": [IotTokenAuthorizerLambdaFunction, "Arn"] }
         Action: lambda:InvokeFunction
         Principal: iot.amazonaws.com
+        SourceArn: { "Fn::GetAtt": [iotAuthorizer, "Arn"] }
+
     # schedulerTable:
     #   Type: AWS::DynamoDB::Table
     #   Properties:
