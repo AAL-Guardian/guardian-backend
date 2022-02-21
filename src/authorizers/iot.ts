@@ -48,16 +48,6 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
             Resource: [
               `${baseArn}:topic/*`,
             ]
-          },
-          {
-            Effect: "Allow",
-            Action: [
-              "iot:UpdateThingShadow",
-              "iot:GetThingShadow"
-            ],
-            Resource: [
-              `${baseArn}:thing/*`,
-            ]
           }
         ]
       }

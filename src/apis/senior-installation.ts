@@ -51,7 +51,7 @@ export default async function (event: APIGatewayEvent, context: any) {
 
   const responseBody = {
     endpoint: endpoint.endpointAddress,
-    authorizer: process.env.stage === 'prod' ? 'GuardianAuthorizer' : 'GuardianAuthorizerDev',
+    authorizer: `GuardianIotAuthorizer-${process.env.stage}`,
     clientId: 'senior-' + body.clientId,
     clientLang: person.language,
     robotTopic: robot.topic,
