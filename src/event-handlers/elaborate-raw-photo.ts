@@ -46,9 +46,12 @@ async function convertPhoto(one: S3EventRecord) {
     const response = new TextDecoder('utf-8').decode(visualization.Payload).toString();
     const responseObj = JSON.parse(response);
     await logEvent(robot_code, 'photo_detection', {
-      key: one.s3.object.key,
+      key: one.s3.object.key + '.jpg',
       response: responseObj
     });
+    if(responseObj?.person === '"person"') {
+      await logEvent(robot_code, 'photo_detected')
+    }
   } catch (e) {
     console.log(e);
   }

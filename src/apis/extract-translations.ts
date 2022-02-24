@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyEventV2 } from "aws-lambda";
+import { APIGatewayProxyEvent } from "aws-lambda";
 import { getResponse } from "../common/response.template";
 import { selectStatement } from "../data/dao";
 import { Translation } from "../data/models/translation.model";

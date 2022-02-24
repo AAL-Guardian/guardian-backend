@@ -48,7 +48,7 @@ export async function checkUserPresence(robotSerialNumber: string, minutesAgo = 
   //check if there was voice in the last minutes
   const guardian_log = await executeStatement(`SELECT id
   FROM guardian_event
-  WHERE event_name in ('voice_detected', 'senior_interaction_detected', 'robot_detected_answer')
+  WHERE event_name in ('voice_detected', 'senior_interaction_detected', 'robot_detected_answer', 'photo_detected')
   AND robot_serial_number = :robot_serial_number
   AND timestamp >= :min_time`, [
     {

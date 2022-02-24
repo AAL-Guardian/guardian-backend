@@ -73,10 +73,11 @@ export async function sendListenCommand(robot: Pick<Robot, 'topic' | 'serial_num
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      guardian_command: 'record_audio',
+      guardian_command: 'listen_voices',
       guardian_data: {
         upload_url: await getPutSignedUrl('detections/' + robot.serial_number + '_' + new Date().getTime() + '.base64'),
-        time
+        time,
+        command: "record_audio"
       },
     }))
   }))
@@ -87,10 +88,11 @@ export async function sendListenAnswerCommand(robot: Pick<Robot, 'topic' | 'seri
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      guardian_command: 'listen_answers',
+      guardian_command: 'listen_voices',
       guardian_data: {
         upload_url: await getPutSignedUrl('answers/' + robot.serial_number + '_' + new Date().getTime() + '.base64'),
-        time
+        time,
+        command: "listen_answers"
       },
     }))
   }))
