@@ -1,12 +1,12 @@
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
-import { sendBase64Audio } from "../services/google-speech-text";
-import { handleAnswerDetected } from "../logic/guardian-event-logic";
-import { getS3 } from "../services/s3";
 import { getPersonByRobotSN } from "../data/robot";
-import { detectEmotion } from '../services/alex';
+import { handleAnswerDetected } from "../logic/guardian-event-logic";
+import { convertAudio, detectEmotion } from '../services/alex';
+import { sendBase64Audio } from "../services/google-speech-text";
+import { getS3 } from "../services/s3";
 
 export default async function (event: S3Event) {
   await Promise.allSettled(event.Records.map(async one => {
@@ -24,22 +24,16 @@ export default async function (event: S3Event) {
     for await (let chunk of content) {
       chunks.push(chunk)
     }
-
     const buffer = Buffer.from(chunks.join(), 'base64');
-    await getS3().send(new PutObjectCommand({
-      Bucket: one.s3.bucket.name,
-      Key: one.s3.object.key + '.wav',
-      ContentType: "audio/wav",
-      Body: buffer
-    }));
     console.log('sending audio to transcription');
-    
+
     const person = await getPersonByRobotSN(robot_code);
     const res = await sendBase64Audio(buffer, person.language);
     console.log('answer: ', res);
     if (res === true || res === false) {
       await handleAnswerDetected(robot_code, res);
-      await detectEmotion(one, robot_code , 'answer')
+      const key = await convertAudio(one);
+      await detectEmotion(one.s3.bucket.name, key, robot_code , 'answer')
     }
   }));
 }

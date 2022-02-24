@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import { DATETIME_FORMAT, executeStatement, insertStatement } from "./dao";
 import { MIN_WINDOW_DIFF } from "./schedule";
 
-export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | any = ""): Promise<void> {
+export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | any = "", clientId: string = null): Promise<void> {
   console.info('inserting log', robotCode, eventName, eventData);
   if (typeof eventData != 'string') {
     eventData = JSON.stringify(eventData);
@@ -25,6 +25,14 @@ export default async function logEvent(robotCode: string, eventName: string = ""
       name: 'event_data',
       value: {
         stringValue: eventData
+      }
+    },
+    {
+      name: 'clients_id',
+      value: clientId ? {
+        stringValue: clientId
+      } : {
+        isNull: true
       }
     },
     {
