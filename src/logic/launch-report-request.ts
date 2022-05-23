@@ -8,6 +8,7 @@ import { getRobotAssignment, getRobotBySN } from "../data/robot";
 import { getPendingReportRequest, getReportRequestById } from "../data/schedule";
 import { sendListenCommand, sendPhotoCaptureCommand, sendSpeakCommand } from "../iot/robot-commands";
 import { sendReportRequest } from "../iot/senior-app-commands";
+import { getRetainedMessage } from '../services/iot';
 
 export async function checkUserAndLaunchReportRequest(id: string) {
   //grab report request
@@ -30,10 +31,17 @@ export async function checkUserAndLaunchReportRequest(id: string) {
     console.warn('No assigment found for report_request: ' + id);
     return;
   }
+  const robot = await getRobotBySN(assignment.robot_serial_number);
+  const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/senior-app/status`);
+    if(seniorStatus?.status === 'asleep') {
+      console.log('system sleeping, skipping')
+      /* the app is in asleep, don't trigger the robot */
+      return;
+    }
 
   if (!(await checkUserPresence(assignment.robot_serial_number))) {
     console.info('No voice detected in last 15 minutes, skipping report request');
-    const robot = await getRobotBySN(assignment.robot_serial_number);
+    
     const [client] = await selectStatement('clients', [
       {
         name: 'id',

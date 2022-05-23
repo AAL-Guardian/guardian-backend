@@ -1,4 +1,5 @@
 import { checkTokenValidity } from "../data/access-token";
+import { getRobotAssignmentById, getRobotBySN } from '../data/robot';
 
 
 export default async function (event: IoTAuthorizerEvent, context: any) {
@@ -12,6 +13,8 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
   const baseArn = `arn:aws:iot:${region}:${account}`;
 
   const token = await checkTokenValidity(event.protocolData.mqtt.username);
+  const robot_ass = await getRobotAssignmentById(token.robot_assignment_id);
+  const robot = await getRobotBySN(robot_ass.robot_serial_number);
   const response = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
     principalId: token.id.toFixed(),  //A string that identifies the connection in logs.
@@ -24,31 +27,14 @@ export default async function (event: IoTAuthorizerEvent, context: any) {
           {
             Effect: "Allow",
             Action: [
-              "iot:Connect"
+              "iot:*",
             ],
             Resource: [
               `${baseArn}:client/*`,
+              `${baseArn}:topicfilter/${robot.topic}/*`,
+              `${baseArn}:topic/${robot.topic}/*`,
             ]
           },
-          {
-            Effect: "Allow",
-            Action: [
-              "iot:Subscribe",
-            ],
-            Resource: [
-              `${baseArn}:topicfilter/*`,
-            ]
-          },
-          {
-            Effect: "Allow",
-            Action: [
-              "iot:Publish",
-              "iot:Receive"
-            ],
-            Resource: [
-              `${baseArn}:topic/*`,
-            ]
-          }
         ]
       }
     ]

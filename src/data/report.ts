@@ -6,6 +6,7 @@ import { ReportQuestion } from "./models/report-question.model";
 import { ReportRequest } from "./models/report-request.model";
 import { ReportType } from "./models/report-type.model";
 import { Client } from "./models/client.model";
+import { ReportFeedback } from './models/report-feedback.model';
 
 export async function getReportSetup(report_type_id: number): Promise<ReportType> {
   const [report_type] = await selectStatement<ReportType>('report_type', [{
@@ -50,6 +51,7 @@ export async function getQuestionOptions(report_question_id: number, extended = 
   if (extended) {
     options = await Promise.all(options.map(async option => {
       option.followup_question = await getOptionFollowUp(option.id, report_question_id, extended)
+      option.feedback = await getOptionFeedbacks(option.id)
       return option;
     }));
   }
@@ -83,6 +85,19 @@ export async function getOptionFollowUp(report_question_option_id: number, repor
     question.options = await getQuestionOptions(question.id, extended);
   }
   return question;
+}
+
+export async function getOptionFeedbacks(report_question_option_id: number) {
+  const feedbacks = await selectStatement<ReportFeedback>('report_feedback',
+    [
+      {
+        name: 'report_question_option_id',
+        value: {
+          longValue: report_question_option_id
+        }
+      }
+    ]);
+  return feedbacks;
 }
 
 export async function setShowDate(report_request: ReportRequest) {

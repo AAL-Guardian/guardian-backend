@@ -1,3 +1,4 @@
+import { ReportFeedback } from './report-feedback.model';
 import { ReportQuestion } from "./report-question.model";
 
 export interface ReportQuestionOption {
@@ -9,4 +10,5 @@ export interface ReportQuestionOption {
   
   selected?: boolean;
   followup_question?: ReportQuestion;
+  feedback?: ReportFeedback[];
 }
