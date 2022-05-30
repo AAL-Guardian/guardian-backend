@@ -5,7 +5,7 @@ import { ReportRequest } from "../data/models/report-request.model";
 import { Robot } from "../data/models/robot.model";
 import { setShowDate } from "../data/report";
 import { getPersonByRobotSN } from "../data/robot";
-import { sendListenAnswerCommand, sendSpeakCommand } from "../iot/robot-commands";
+import { sendEmotion, sendListenAnswerCommand, sendSpeakCommand } from "../iot/robot-commands";
 import { ReportQuestion } from "../data/models/report-question.model";
 
 interface AbstractIotEvent {
@@ -59,6 +59,14 @@ export default async function (event: ShowingQuestionEvent | AnyIotEvent) {
       const text = event.data.text;
       const person = await getPersonByRobotSN(robot.serial_number)
       await sendSpeakCommand(robot, text, person.language);
+      break;
+    }
+    case 'showing_message_emotion': {
+      const text = event.data.text;
+      const emotion = event.data.emotion;
+      const person = await getPersonByRobotSN(robot.serial_number)
+      await sendSpeakCommand(robot, text, person.language);
+      await sendEmotion(robot, emotion);
       break;
     }
     case 'showing_report':

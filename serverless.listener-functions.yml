@@ -68,4 +68,12 @@ functions:
       - schedule:
           rate: cron(0/15 6-22 ? * * *)
           enabled: true
+  
+  systemStatusChangeHandler:
+    handler: src/event-handlers/system-status-change.default
+    events:
+      - iot:
+          sql: "SELECT * as data, topic(1) as robot_topic FROM '+/system/status' WHERE startswith(topic(1), 'misty_${self:provider.stage}') = true"
+          enabled: true
+          sqlVersion: '2016-03-23'
     

@@ -146,3 +146,15 @@ export async function sendChangeLedCommand(robot: Pick<Robot, 'topic' | 'serial_
   }))
   await logEvent(robot.serial_number, 'change_led');
 }
+
+export type Emotions = 'how_are_you' | 'sleep' | 'yes' | 'medication' | 'yesmedication' | 'meal' | 'activitysuggestion' | 'dormi' | 'sveglia';
+export async function sendEmotion(robot: Pick<Robot, 'topic' | 'serial_number'>, emotion: Emotions ) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'emotion_'+emotion,
+      guardian_data: undefined,
+    }))
+  }))
+  await logEvent(robot.serial_number, 'emotion_'+emotion);
+}

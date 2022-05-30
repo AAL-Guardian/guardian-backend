@@ -1,7 +1,7 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getRobotBySN } from "../../data/robot";
 import { getResponse } from "../../common/response.template";
-import { sendListenAnswerCommand, sendListenCommand, sendMoveHeadCommand, sendPhotoCaptureCommand } from "../../iot/robot-commands";
+import { sendEmotion, sendListenAnswerCommand, sendListenCommand, sendMoveHeadCommand, sendPhotoCaptureCommand } from "../../iot/robot-commands";
 
 export default async function (event: APIGatewayEvent) {
   const response = getResponse() as APIGatewayProxyResult;
@@ -26,6 +26,10 @@ export default async function (event: APIGatewayEvent) {
     }
     case 'move_head': {
       await sendMoveHeadCommand(robot, data.angle);
+      break;
+    }
+    case 'emotion': {
+      await sendEmotion(robot, data.emotion);
       break;
     }
   }
