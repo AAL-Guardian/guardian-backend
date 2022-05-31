@@ -63,10 +63,12 @@ export default async function (event: ShowingQuestionEvent | AnyIotEvent) {
     }
     case 'showing_message_emotion': {
       const text = event.data.text;
-      const emotion = event.data.emotion;
       const person = await getPersonByRobotSN(robot.serial_number)
       await sendSpeakCommand(robot, text, person.language);
-      await sendEmotion(robot, emotion);
+      const emotion = event.data.emotion;
+      if(emotion) {
+        await sendEmotion(robot, emotion);
+      }
       break;
     }
     case 'showing_report':

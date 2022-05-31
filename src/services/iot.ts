@@ -1,4 +1,4 @@
-import { GetRetainedMessageCommand, IoTDataPlaneClient } from "@aws-sdk/client-iot-data-plane";
+import { GetRetainedMessageCommand, IoTDataPlaneClient, PublishCommand } from "@aws-sdk/client-iot-data-plane";
 
 const iotDataClient = new IoTDataPlaneClient({
 
@@ -13,6 +13,14 @@ export async function getRetainedMessage<T>(topic: string): Promise<T | null> {
   }))
   const decodedPayload = new TextDecoder().decode(res.payload);
   return decodedPayload ? JSON.parse(decodedPayload) : null;
+}
+
+export async function sendRetainedMessage(topic: string, payload: unknown): Promise<void> {
+  await iotDataClient.send(new PublishCommand({
+    topic,
+    payload: new TextEncoder().encode(JSON.stringify(payload)),
+    retain: true
+  }))
 }
 
 export {
