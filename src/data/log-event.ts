@@ -2,9 +2,9 @@ import dayjs = require("dayjs");
 import { DATETIME_FORMAT, executeStatement, insertStatement } from "./dao";
 import { MIN_WINDOW_DIFF } from "./schedule";
 
-export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | any = "", clientId: string = null): Promise<void> {
+export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | unknown = "", clientId: string = null): Promise<void> {
   console.info('inserting log', robotCode, eventName, eventData);
-  if (typeof eventData != 'string') {
+  if (typeof eventData !== 'string') {
     eventData = JSON.stringify(eventData);
   }
   // await executeStatement("INSERT INTO guardian_event (robot_serial_number, event_name, event_data, timestamp) values (:robot_serial_number, :event_name, :event_data, current_timestamp)", [
@@ -24,7 +24,7 @@ export default async function logEvent(robotCode: string, eventName: string = ""
     {
       name: 'event_data',
       value: {
-        stringValue: eventData
+        stringValue: eventData as string
       }
     },
     {
@@ -48,7 +48,7 @@ export async function checkUserPresence(robotSerialNumber: string, minutesAgo = 
   //check if there was voice in the last minutes
   const guardian_log = await executeStatement(`SELECT id
   FROM guardian_event
-  WHERE event_name in ('voice_detected', 'senior_interaction_detected', 'robot_detected_answer', 'photo_detected')
+  WHERE event_name in ('voice_detected', 'senior_interaction_detected', 'robot_interaction','robot_detected_answer', 'photo_detected')
   AND robot_serial_number = :robot_serial_number
   AND timestamp >= :min_time`, [
     {

@@ -6,6 +6,15 @@ import { Robot } from "./models/robot.model";
 import dayjs = require("dayjs");
 import { Person } from "./models/person.model";
 
+export const getRobotByTopic = (robotTopic: string) => selectStatement('robot', [
+  {
+    name: 'topic',
+    value: {
+      stringValue: robotTopic
+    }
+  }
+]);
+
 export async function getRobotBySN(serial_number: string): Promise<Robot | undefined> {
   // const all = await executeStatement("SELECT * FROM robot WHERE serial_number = :serial_number", [{
   const all = await selectStatement<Robot>("robot", [{
