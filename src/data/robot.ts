@@ -1,12 +1,12 @@
 import { Field } from "@aws-sdk/client-rds-data";
-import { DATE_FORMAT, executeStatement, insertStatement, selectStatement, updateStatement } from "./dao";
+import { DATE_FORMAT, executeStatement, getOneBy, insertStatement, selectStatement, updateStatement } from "./dao";
 import { Assignment } from "./models/assignment.model";
 import { Client } from "./models/client.model";
 import { Robot } from "./models/robot.model";
 import dayjs = require("dayjs");
 import { Person } from "./models/person.model";
 
-export const getRobotByTopic = (robotTopic: string) => selectStatement('robot', [
+export const getRobotByTopic = (robotTopic: string) => getOneBy<Robot>('robot', [
   {
     name: 'topic',
     value: {

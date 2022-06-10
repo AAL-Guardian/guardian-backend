@@ -12,9 +12,9 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
     // if(process.env.IS_OFFLINE === 'true') {
     //   res = await connectedStatement(sql, parameters);  
     // } else {
-      res = await invokeStatement(sql, parameters);
+    res = await invokeStatement(sql, parameters);
     // }
-    
+
     // const res = await dataApiStatement(sql, parameters);
     console.log('Statement Time: ' + (Date.now() - start));
 
@@ -67,5 +67,10 @@ export async function selectStatement<T = { [key: string]: any }>(table_name: st
   const sql = `SELECT * FROM ${table_name} WHERE ${parameters?.length > 0 ? parameters.map(one => `${one.name} = :${one.name}`).join(' AND ') : '1 = 1'}`;
   // console.log(sql, parameters);
   return await executeStatement(sql, parameters, true) as T[];
+}
+
+export async function getOneBy<T = { [key: string]: any }>(table_name: string, parameters?: SqlParameter[]): Promise<T> {
+  const [res] = await selectStatement<T>(table_name, parameters);
+  return res;
 }
 

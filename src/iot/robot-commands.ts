@@ -1,5 +1,5 @@
 import { IoTDataPlaneClient, PublishCommand } from "@aws-sdk/client-iot-data-plane";
-import { PollyClient, SynthesizeSpeechCommand, SynthesizeSpeechInput } from "@aws-sdk/client-polly";
+import { PollyClient, SynthesizeSpeechCommand, SynthesizeSpeechInput, TextType } from "@aws-sdk/client-polly";
 import { getSynthesizeSpeechUrl } from "@aws-sdk/polly-request-presigner";
 import { getPutSignedUrl } from "../services/s3";
 import logEvent from "../data/log-event";
@@ -9,36 +9,71 @@ const iotData = new IoTDataPlaneClient({});
 const pollyClient = new PollyClient({});
 
 export async function sendSpeakCommand(robot: Robot, message: string, language: string) {
+  let volume: number = 100;
+  let rate: 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' | 0 | 1 | 2 | 3 | 4;
+  let gender: string = 'female';
+  try {
+    const extra = JSON.parse(robot.extra);
+    volume = extra.volume;
+    if (extra.rate !== undefined) {
+      rate = extra.rate;
+    }
+    if (extra.gender) {
+      gender = extra.gender;
+    }
+  } finally {
+    console.log('now what?')
+  }
+  switch (rate) {
+    case 0:
+      rate = 'x-slow'
+      break;
+    case 1:
+      rate = 'slow'
+      break;
+    case 3:
+      rate = 'fast'
+      break;
+    case 4:
+      rate = 'x-fast'
+      break;
+    case 2:
+    default:
+      rate = 'medium'
+  }
+
   const params = {
     OutputFormat: "mp3",
     SampleRate: "16000",
-    Text: message,
-    TextType: 'text',
+    Text: `<speak>
+    <prosody rate="${rate}">${message}</prosody>
+    </speak>`,
+    TextType: TextType.SSML,
   } as SynthesizeSpeechInput;
 
   switch (language) {
     case 'it':
     case 'it-IT':
       params.LanguageCode = 'it-IT';
-      params.VoiceId = 'Carla'
+      params.VoiceId = gender === 'male' ? 'Giorgio' : 'Carla'
       params.Engine = "standard"
       break;
     case 'en':
     case 'en-GB':
       params.LanguageCode = 'en-GB';
-      params.VoiceId = 'Amy'
+      params.VoiceId = gender === 'male' ? 'Brian' : 'Amy'
       params.Engine = "neural"
       break;
     case 'nl':
     case 'nl-NL':
       params.LanguageCode = 'nl-NL';
-      params.VoiceId = 'Lotte';
+      params.VoiceId = gender === 'male' ? 'Ruben' : 'Lotte';
       params.Engine = 'standard';
       break;
     case 'fr':
     case 'fr-FR':
       params.LanguageCode = 'fr-FR';
-      params.VoiceId = 'Celine';
+      params.VoiceId = gender === 'male' ? 'Mathieu' : 'Celine'
       params.Engine = 'standard';
       break;
   }
@@ -47,12 +82,6 @@ export async function sendSpeakCommand(robot: Robot, message: string, language: 
     client: pollyClient,
     params
   });
-  let volume = 100;
-  try {
-    volume = JSON.parse(robot.extra)?.volume;
-  } catch (e) {
-
-  }
 
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',
@@ -148,13 +177,13 @@ export async function sendChangeLedCommand(robot: Pick<Robot, 'topic' | 'serial_
 }
 
 export type Emotions = 'how_are_you' | 'sleep' | 'yes' | 'medication' | 'yesmedication' | 'meal' | 'activitysuggestion' | 'dormi' | 'sveglia';
-export async function sendEmotion(robot: Pick<Robot, 'topic' | 'serial_number'>, emotion: Emotions ) {
+export async function sendEmotion(robot: Pick<Robot, 'topic' | 'serial_number'>, emotion: Emotions) {
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({
-      guardian_command: 'emotion_'+emotion,
+      guardian_command: 'emotion_' + emotion,
       guardian_data: undefined,
     }))
   }))
-  await logEvent(robot.serial_number, 'emotion_'+emotion);
+  await logEvent(robot.serial_number, 'emotion_' + emotion);
 }
