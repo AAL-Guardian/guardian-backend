@@ -154,7 +154,7 @@ export async function sendMoveHeadCommand(robot: Pick<Robot, 'topic' | 'serial_n
   await logEvent(robot.serial_number, 'moved_head', angle);
 }
 
-export async function sendEyeContactCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, status: 'sleep' | 'normal' | 'off') {
+export async function sendEyeContactCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, status: 'sleep' | 'on' | 'off') {
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',
     payload: (new TextEncoder()).encode(JSON.stringify({

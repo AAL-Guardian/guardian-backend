@@ -1,7 +1,7 @@
 import { selectStatement } from "../data/dao";
 import logEvent from "../data/log-event";
 import { Robot } from "../data/models/robot.model";
-import { sendEmotion } from "../iot/robot-commands";
+import { sendEmotion, sendEyeContactCommand } from "../iot/robot-commands";
 
 interface AbstractIotEvent {
   topic: string;
@@ -28,7 +28,8 @@ export default async function (event: AnyIotEvent & {}) {
 
   switch (systemStatus) {
     case 'asleep':
-      sendEmotion(robot, 'dormi');
+      await sendEmotion(robot, 'dormi');
+      await sendEyeContactCommand(robot, 'off');
       break;
     case 'awake':
       sendEmotion(robot, 'sveglia');
