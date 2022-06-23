@@ -9,7 +9,7 @@ export default async function (params: CloudWatchLogsEvent) {
     /* get robot info */
     const robot = await getRobotBySN(one.robot_serial_number);
     /* set asleep status */
-    await sendRetainedMessage(`${robot.topic}/senior-app/status`, { status: 'asleep'});
+    await sendRetainedMessage(`${robot.topic}/system/status`, { status: 'asleep'});
     await sendEmotion(robot, 'dormi');
   }));
 }

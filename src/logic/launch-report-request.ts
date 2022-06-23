@@ -32,7 +32,7 @@ export async function checkUserAndLaunchReportRequest(id: string) {
     return;
   }
   const robot = await getRobotBySN(assignment.robot_serial_number);
-  const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/senior-app/status`);
+  const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/system/status`);
     if(seniorStatus?.status === 'asleep') {
       console.log('system sleeping, skipping')
       /* the app is in asleep, don't trigger the robot */

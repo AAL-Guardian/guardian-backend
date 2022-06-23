@@ -9,7 +9,7 @@ export default async function (params: CloudWatchLogsEvent) {
     /* get robot info */
     const robot = await getRobotBySN(one.robot_serial_number);
     /* get last app status */
-    const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/senior-app/status`);
+    const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/system/status`);
     if(seniorStatus?.status === 'asleep') {
       /* the app is in asleep, don't trigger the robot */
       return;
