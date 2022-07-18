@@ -3,7 +3,7 @@ import { Robot } from "../data/models/robot.model";
 import { getClientByRobotSN, getRobotBySN } from "../data/robot";
 import { getPendingReportRequest } from "../data/schedule";
 import { sendAnswerDetectedEvent } from "../iot/cloud-events";
-import { sendChangeLedCommand, sendEmotion } from "../iot/robot-commands";
+import { Emotions, sendChangeLedCommand, sendEmotion } from "../iot/robot-commands";
 import { sendRetainedMessage } from '../services/iot';
 import { launchReportRequest } from "./launch-report-request";
 
@@ -30,11 +30,17 @@ export async function handleSeniorAppInteraction(robot: Robot) {
   ])
 }
 
-export async function handleRobotInteraction(robot: Robot, data: unknown) {
+export async function handleRobotInteraction(robot: Robot, data: unknown, awake = true) {
+  let status = 'awake';
+  let emotion: Emotions = 'sveglia';
+  if(!awake) {
+    status = 'asleep';
+    emotion = 'dormi';
+  }
   await Promise.all([
     logEvent(robot.serial_number, 'robot_interaction', data),
-    sendRetainedMessage(`${robot.topic}/system/status`, { status: 'awake'}),
-    sendEmotion(robot, 'sveglia')
+    sendRetainedMessage(`${robot.topic}/system/status`, { status }),
+    // sendEmotion(robot, emotion)
   ])
 }
 

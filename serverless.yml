@@ -125,6 +125,7 @@ provider:
   # this is needed to connect to RDS but it breaks other AWS services
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    NODE_OPTIONS: --enable-source-maps
     stackName: ${self:service}
     stage: ${self:provider.stage}
     version: 0.0.1
