@@ -11,8 +11,8 @@ import { translate } from "../data/translation";
 export default async function (event: APIGatewayProxyEventBase<AuthContext>) {
   const response = getResponse();
   const report_type_id = event.pathParameters.id
-  
-  const [ person ] = await selectStatement<Person>('persons', [{
+
+  const [person] = await selectStatement<Person>('persons', [{
     name: 'id',
     value: {
       stringValue: event.requestContext.authorizer.personId
@@ -37,9 +37,10 @@ function translateQuestion(question: ReportQuestion, translations: Translation[]
   question.options = question.options.map(
     option => {
       option = translate(option, 'report_question_option', translations);
-      if(option.followup_question) {
+      if (option.followup_question) {
         option.followup_question = translateQuestion(option.followup_question, translations);
       }
+      option.feedback?.map(feedback => translate(feedback, 'report_feedback', translations))
       return option
     }
   );

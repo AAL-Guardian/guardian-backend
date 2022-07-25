@@ -1,4 +1,4 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
@@ -29,11 +29,16 @@ export default async function (event: S3Event) {
 
     const person = await getPersonByRobotSN(robot_code);
     const res = await sendBase64Audio(buffer, person.language);
+    const key = await convertAudio(one);
     console.log('answer: ', res);
     if (res === true || res === false) {
       await handleAnswerDetected(robot_code, res);
-      const key = await convertAudio(one);
-      await detectEmotion(one.s3.bucket.name, key, robot_code , 'answer')
+      await detectEmotion(one.s3.bucket.name, key, robot_code, 'answer')
     }
+
+    await getS3().send(new DeleteObjectCommand({
+      Bucket: one.s3.bucket.name,
+      Key: one.s3.object.key
+    }))
   }));
 }
