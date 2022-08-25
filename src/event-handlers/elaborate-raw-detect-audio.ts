@@ -1,6 +1,8 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { S3Event, S3EventRecord } from "aws-lambda";
 import { convertAudio, detectEmotion, detectVoice } from '../services/alex';
+import { getS3 } from '../services/s3';
 
 const lambda = new LambdaClient({});
 
@@ -15,6 +17,17 @@ export default async function (event: S3Event) {
       }
     } catch (e) {
       await detectEmotion(one.s3.bucket.name, key, sn, 'detect');
+    } finally {
+      await getS3().send(new DeleteObjectCommand({
+        Bucket: one.s3.bucket.name,
+        Key: one.s3.object.key
+      }));
+      if (key && process.env.stage === 'prod') {
+        await getS3().send(new DeleteObjectCommand({
+          Bucket: one.s3.bucket.name,
+          Key: key
+        }));
+      }
     }
   }));
 }

@@ -74,11 +74,12 @@ export async function checkUserAndLaunchReportRequest(id: string) {
         break;
     }
     await sendSpeakCommand(robot, message, person.language);
-    await sendPhotoCaptureCommand(robot, 0);
-    await sendEyeContactCommand(robot, 'on');
-    /** wait 3 seconds */
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await sendPhotoCaptureCommand(robot, 0);    
+
     await sendListenCommand(robot);
+    /** wait 5 seconds */
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    await sendEyeContactCommand(robot, 'on');
     return;
   } else {
     // launching request

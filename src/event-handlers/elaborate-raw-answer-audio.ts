@@ -29,16 +29,28 @@ export default async function (event: S3Event) {
 
     const person = await getPersonByRobotSN(robot_code);
     const res = await sendBase64Audio(buffer, person.language);
-    const key = await convertAudio(one);
     console.log('answer: ', res);
-    if (res === true || res === false) {
-      await handleAnswerDetected(robot_code, res);
-      await detectEmotion(one.s3.bucket.name, key, robot_code, 'answer')
+    let newKey: string;
+    try {
+      if (res === true || res === false) {
+        await handleAnswerDetected(robot_code, res);
+        const newKey = await convertAudio(one);
+        await detectEmotion(one.s3.bucket.name, newKey, robot_code, 'answer')
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      // TODO delete all if prod
+      await getS3().send(new DeleteObjectCommand({
+        Bucket: one.s3.bucket.name,
+        Key: one.s3.object.key
+      }))
+      if (newKey && process.env.stage === 'prod') {
+        await getS3().send(new DeleteObjectCommand({
+          Bucket: one.s3.bucket.name,
+          Key: newKey
+        }))
+      }
     }
-
-    await getS3().send(new DeleteObjectCommand({
-      Bucket: one.s3.bucket.name,
-      Key: one.s3.object.key
-    }))
   }));
 }

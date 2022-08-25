@@ -1,5 +1,5 @@
 import { InvokeCommand } from '@aws-sdk/client-lambda';
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { S3Event, S3EventRecord } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
@@ -54,5 +54,12 @@ async function convertPhoto(one: S3EventRecord) {
     }
   } catch (e) {
     console.log(e);
+  } finally {
+    if (process.env.stage === 'prod') {
+      await getS3().send(new DeleteObjectCommand({
+        Bucket: one.s3.bucket.name,
+        Key: one.s3.object.key
+      }));
+    }
   }
 }
