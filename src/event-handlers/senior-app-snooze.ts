@@ -1,13 +1,11 @@
-import { checkAndLaunchPendingReports } from "../logic/launch-report-request";
-import { selectStatement } from "../data/dao";
+import { selectStatement, updateStatement } from "../data/dao";
 import logEvent from "../data/log-event";
-import { Client } from "../data/models/client.model";
 import { ReportRequest } from "../data/models/report-request.model";
-import { ReportType } from "../data/models/report-type.model";
 import { Robot } from "../data/models/robot.model";
-import { elaborateQuestionAnswer, insertAnswer, insertSelfReportRequest } from "../data/report";
-import { getRobotAssignment } from "../data/robot";
+import { snoozeReportRequest } from '../data/schedule';
+import { scheduleNextEvent } from '../logic/event-scheduler';
 import { handleSeniorAppInteraction } from "../logic/guardian-event-logic";
+import { checkAndLaunchPendingReports } from "../logic/launch-report-request";
 
 interface MyIotEvent {
   topic: string;
@@ -34,15 +32,16 @@ export default async function (event: MyIotEvent) {
   if(withInteraction) {
     await handleSeniorAppInteraction(robot);
   }
-  const assignment = await getRobotAssignment(robot.serial_number);
-  const [client] = await selectStatement('clients', [
-    {
-      name: 'id',
-      value: {
-        stringValue: reportRequest.client_id
-      }
-    }
-  ]) as Client[];
+  // const assignment = await getRobotAssignment(robot.serial_number);
+  // const [client] = await selectStatement('clients', [
+  //   {
+  //     name: 'id',
+  //     value: {
+  //       stringValue: reportRequest.client_id
+  //     }
+  //   }
+  // ]) as Client[];
+  await snoozeReportRequest(reportRequest)
   await checkAndLaunchPendingReports();
-  // scheduleNextEvent();
+  await scheduleNextEvent();
 }

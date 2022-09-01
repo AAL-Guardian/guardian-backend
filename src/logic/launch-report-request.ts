@@ -102,6 +102,7 @@ export async function launchReportRequest(reportRequest: ReportRequest) {
 
 export async function checkAndLaunchPendingReports() {
   const nextRequests = await getPendingReportRequest();
+  console.log(`Reports to elaborate: `, nextRequests);
   console.log(`Found ${nextRequests.length} Reports to elaborate`);
   const singleRequests = nextRequests.reduce((list, curr) => {
     if (!list.some(one => one.client_id === curr.client_id)) {
