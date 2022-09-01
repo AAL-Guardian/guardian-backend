@@ -109,7 +109,7 @@ export async function snoozeReportRequest(reportRequest: Pick<ReportRequest, 'id
     newReportRequest.remind_again_minutes = 30;
   }
 
-  if (newReportRequest.reminder_shown_times <= newReportRequest.remind_again_times) {
+  if (newReportRequest.reminder_shown_times < newReportRequest.remind_again_times) {
     newReportRequest.remind_later = 1
   } else {
     newReportRequest.remind_later = 0
