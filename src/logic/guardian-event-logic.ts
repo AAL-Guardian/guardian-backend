@@ -26,7 +26,7 @@ export async function handleVoiceDetected(robot_code: Robot['serial_number']) {
 export async function handleSeniorAppInteraction(robot: Robot) {
   await Promise.all([
     logEvent(robot.serial_number, 'senior_interaction_detected'),
-    sendChangeLedCommand(robot),
+    // sendChangeLedCommand(robot),
   ])
 }
 

@@ -55,6 +55,13 @@ functions:
           sql: "SELECT reportRequest, reportSetup, topic(1) as robot_topic FROM '+/senior-app/answer' WHERE startswith(topic(1), 'misty_${self:provider.stage}') = true"
           enabled: true
           sqlVersion: '2016-03-23'
+  seniorAppSnooze:
+    handler: src/event-handlers/senior-app-snooze.default
+    events:
+      - iot:
+          sql: "SELECT reportRequest, withInteraction, topic(1) as robot_topic FROM '+/senior-app/snooze' WHERE startswith(topic(1), 'misty_${self:provider.stage}') = true"
+          enabled: true
+          sqlVersion: '2016-03-23'
   robotEventHandler:
     handler: src/event-handlers/robot-event-reaction.default
     events:

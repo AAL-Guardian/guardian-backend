@@ -101,22 +101,14 @@ export async function getOptionFeedbacks(report_question_option_id: number) {
 }
 
 export async function setShowDate(report_request: ReportRequest) {
-  await updateStatement('report_request',
+  await executeStatement('UPDATE report_request SET date_shown = CURRENT_TIMESTAMP, reminder_shown_times = reminder_shown_times + 1 WHERE id = :id',
     [
       {
-        name: 'date_shown',
-        value: {
-          stringValue: dayjs().format(DATETIME_FORMAT)
-        }
+      name: 'id',
+      value: {
+        stringValue: report_request.id
       }
-    ],
-    [
-      {
-        name: 'id',
-        value: {
-          stringValue: report_request.id
-        }
-      }
+    }
     ]
   )
 }

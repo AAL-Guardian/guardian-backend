@@ -14,7 +14,11 @@ export interface ReportRequest {
   version: string,
   date_updated: string | Date | Dayjs,
   date_deleted?: string,
-  time?: number
-
+  time?: number,
+  next_schedule?: string | Date | Dayjs,
+  remind_again_times: number,
+  remind_again_minutes: number,
+  remind_later: number,
+  reminder_shown_times: number,
   report_question: ReportQuestion[];
 }
