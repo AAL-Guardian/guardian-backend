@@ -50,7 +50,7 @@ export default async function (event: ShowingQuestionEvent | AnyIotEvent) {
       await sendEmotion(robot, 'how_are_you');
       await sendSpeakCommand(robot, question.description, person.language);
       if (event.data.askYesNo) {
-        await new Promise((resolve, reject) => setTimeout(resolve, 5000));
+        await new Promise((resolve, reject) => setTimeout(resolve, 7000));
         await sendListenAnswerCommand(robot)
       }
 

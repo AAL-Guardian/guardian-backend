@@ -65,7 +65,7 @@ AND (
     remind_later = 1
     AND remind_again_minutes > 0
     AND date_add(date_scheduled, INTERVAL remind_again_minutes MINUTE) BETWEEN :time_ago AND :end_time
-    AND ifnull(date_shown, now()) < date_sub(now() INTERVAL 3 MINUTES)
+    AND ifnull(date_shown, now()) < date_sub(now(), INTERVAL 3 MINUTE)
   )
 )`, [
     {

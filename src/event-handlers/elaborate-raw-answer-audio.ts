@@ -32,11 +32,12 @@ export default async function (event: S3Event) {
     console.log('answer: ', res);
     let newKey: string;
     try {
+      let newKeyJob: Promise<string> = convertAudio(one);
       if (res === true || res === false) {
         await handleAnswerDetected(robot_code, res);
-        const newKey = await convertAudio(one);
         await detectEmotion(one.s3.bucket.name, newKey, robot_code, 'answer')
       }
+      newKey = await newKeyJob;
     } catch (e) {
       console.log(e);
     } finally {
