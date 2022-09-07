@@ -59,7 +59,7 @@ export async function executeStatement(sql: string, parameters: SqlParameter[] =
 
 function queryFormat(query: string, values: SqlParameter[]) {
   if (!values || values.length === 0) return query;
-  query = query.replace(/\:(\w+)/g, (txt, key) => {
+  query = query.replaceAll(/\:(\w+)/g, (txt, key) => {
     const value = values.find(one => one.name === key);
     if (value) {
       if(value.value.isNull) {
