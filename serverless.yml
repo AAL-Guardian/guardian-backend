@@ -53,7 +53,7 @@ custom:
 # The `provider` block defines where your service will be deployed
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   stage: ${opt:stage, 'dev'} # opt is the serverless deploy command options ( serverless deploy option value )
   region: eu-west-1
   memorySize: 1024
