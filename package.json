@@ -23,7 +23,6 @@
     "@types/node": "^16.11.59",
     "@types/node-fetch": "^3.0.3",
     "@types/uuid": "^8.3.4",
-    "aws-crt": "^1.14.4",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.5.2",
     "serverless": "^3.22.0",

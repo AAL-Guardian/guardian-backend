@@ -9,7 +9,7 @@ import { promises } from 'fs';
 import { getResponse } from "../common/response.template";
 import logEvent from '../data/log-event';
 import { getRobotBySN, insertRobot } from '../data/robot';
-import shellExec = require('shell-exec');
+import shellExec from 'shell-exec';
 require('./../AmazonRootCA1.pem');
 
 const iot = new IoTClient({
