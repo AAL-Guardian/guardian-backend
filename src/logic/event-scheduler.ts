@@ -29,7 +29,7 @@ export async function scheduleNextEvent(ruleName?: string) {
     console.log('next scheduled', fistScheduled);
   
     if(fistScheduled) {
-      const nextDate = dayjs(fistScheduled.date_scheduled);
+      const nextDate = dayjs(fistScheduled.next_schedule);
       schedule = `cron(${nextDate.format('mm HH DD MM ? YYYY')})`
     }
     if(rule.ScheduleExpression !== schedule) {
