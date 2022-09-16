@@ -111,5 +111,6 @@ export async function checkAndLaunchPendingReports() {
     return list;
   }, [] as ReportRequest[]);
   console.log(`Found ${singleRequests.length} Reports really to elaborate`);
-  return await Promise.all(singleRequests.map(async one => await checkUserAndLaunchReportRequest(one.id)))
+  const res = await Promise.allSettled(singleRequests.map(async one => await checkUserAndLaunchReportRequest(one.id)))
+  console.log(res);
 }

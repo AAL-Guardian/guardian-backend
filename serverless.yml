@@ -59,6 +59,7 @@ provider:
   memorySize: 1024
   timeout: 30
   versionFunctions: false
+  deploymentMethod: direct
   apiGateway:
     minimumCompressionSize: 1024
     shouldStartNameWithService: true
