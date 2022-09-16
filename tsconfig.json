@@ -6,15 +6,9 @@
       "*": ["types/*"]
     },
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2021",
     "lib": [
-      "es5",
-      "es6",
-      "dom",
-      "es2015",
-      "es2017",
-      "esnext",
-      "esnext.asynciterable"
+      "es2021"
     ],
     "experimentalDecorators": false,
     "moduleResolution": "node",
