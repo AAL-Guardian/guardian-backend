@@ -3,6 +3,7 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sd
 import { S3Event, S3EventRecord } from "aws-lambda";
 import { Readable } from "stream";
 import logEvent from "../data/log-event";
+import { handleUserDetected } from '../logic/guardian-event-logic';
 import { lambda } from '../services/lambda';
 import { getS3 } from "../services/s3";
 
@@ -50,7 +51,8 @@ async function convertPhoto(one: S3EventRecord) {
       response: responseObj
     });
     if(responseObj?.person === '"person"') {
-      await logEvent(robot_code, 'photo_detected')
+      await logEvent(robot_code, 'photo_detected');
+      await handleUserDetected(robot_code);
     }
   } catch (e) {
     console.log(e);

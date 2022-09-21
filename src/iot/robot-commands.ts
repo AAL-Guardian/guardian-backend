@@ -141,6 +141,16 @@ export async function sendPhotoCaptureCommand(robot: Pick<Robot, 'topic' | 'seri
   await logEvent(robot.serial_number, 'take_photo');
 }
 
+export async function sendTouchDetectStatusCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, on: boolean) {
+  await iotData.send(new PublishCommand({
+    topic: robot.topic + '/command',
+    payload: (new TextEncoder()).encode(JSON.stringify({
+      guardian_command: 'sense_touch',
+      guardian_data: on ? 'on' : 'off',
+    }))
+  }))
+}
+
 export async function sendMoveHeadCommand(robot: Pick<Robot, 'topic' | 'serial_number'>, angle: number) {
   await iotData.send(new PublishCommand({
     topic: robot.topic + '/command',

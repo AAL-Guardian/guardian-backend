@@ -12,5 +12,7 @@ export default async function (event: {
     } else if (event.data.tosleep === false) {
       await handleRobotInteraction(robot, event.data, true);
     }
+  } else if (event.data?.skill === 'eye_contact') {
+    
   }
 }

@@ -1,7 +1,9 @@
+import sendCommand from '../apis/tests/send-command';
 import { selectStatement } from "../data/dao";
 import logEvent from "../data/log-event";
 import { Robot } from "../data/models/robot.model";
-import { sendEmotion, sendEyeContactCommand } from "../iot/robot-commands";
+import { sendEmotion, sendEyeContactCommand, sendTouchDetectStatusCommand } from "../iot/robot-commands";
+import { handleUserDetected } from '../logic/guardian-event-logic';
 
 interface AbstractIotEvent {
   topic: string;
@@ -29,10 +31,13 @@ export default async function (event: AnyIotEvent & {}) {
   switch (systemStatus) {
     case 'asleep':
       await sendEmotion(robot, 'dormi');
+      await sendTouchDetectStatusCommand(robot, false);
       await sendEyeContactCommand(robot, 'off');
       break;
     case 'awake':
-      sendEmotion(robot, 'sveglia');
+      await sendEmotion(robot, 'sveglia');
+      await sendTouchDetectStatusCommand(robot, true);
+      await handleUserDetected(robotTopic);
       break;
     default: {
       console.log('Error in detecting system status', event);

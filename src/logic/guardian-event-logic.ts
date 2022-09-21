@@ -3,20 +3,24 @@ import { Robot } from "../data/models/robot.model";
 import { getClientByRobotSN, getRobotBySN } from "../data/robot";
 import { getPendingReportRequest } from "../data/schedule";
 import { sendAnswerDetectedEvent } from "../iot/cloud-events";
-import { Emotions, sendChangeLedCommand, sendEmotion } from "../iot/robot-commands";
+import { Emotions, sendChangeLedCommand } from "../iot/robot-commands";
 import { sendRetainedMessage } from '../services/iot';
 import { launchReportRequest } from "./launch-report-request";
 
 export async function handleVoiceDetected(robot_code: Robot['serial_number']) {
-  const client = await getClientByRobotSN(robot_code);
-  if(!client) {
-    return;
-  }
   const robot = await getRobotBySN(robot_code);
   await Promise.all([
     logEvent(robot_code, 'voice_detected'),
     sendChangeLedCommand(robot)
   ]);
+  await handleUserDetected(robot_code);
+}
+
+export async function handleUserDetected(robot_code: Robot['serial_number']) {
+  const client = await getClientByRobotSN(robot_code);
+  if(!client) {
+    return;
+  }
   const lastReportRequest = await getPendingReportRequest(client.id); 
   if(lastReportRequest.length > 0) {
     await launchReportRequest(lastReportRequest[0])
