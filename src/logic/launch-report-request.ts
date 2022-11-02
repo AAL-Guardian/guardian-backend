@@ -28,19 +28,19 @@ export async function checkUserAndLaunchReportRequest(id: string) {
   //get assignment for a certain client
   const assignment = await getRobotAssignment(undefined, report_request.client_id);
   if (!assignment) {
-    console.warn('No assigment found for report_request: ' + id);
+    console.log('No assigment found for report_request: ' + id);
     return;
   }
   const robot = await getRobotBySN(assignment.robot_serial_number);
   const seniorStatus = await getRetainedMessage<{ status: string } | null>(`${robot.topic}/system/status`);
     if(seniorStatus?.status === 'asleep') {
-      console.log('system sleeping, skipping')
+      console.log('system sleeping, skipping report', report_request)
       /* the app is in asleep, don't trigger the robot */
       return;
     }
 
   if (!(await checkUserPresence(assignment.robot_serial_number))) {
-    console.info('No voice detected in last 15 minutes, skipping report request');
+    console.log('No voice detected in last 15 minutes, skipping report request');
     
     const [client] = await selectStatement('clients', [
       {
@@ -88,13 +88,14 @@ export async function checkUserAndLaunchReportRequest(id: string) {
 }
 
 export async function launchReportRequest(reportRequest: ReportRequest) {
+  console.log('launchReportRequest', reportRequest);
   if (reportRequest.date_shown) {
-    console.info('Report Request already shown, skipping');
+    console.log('Report Request already shown, skipping');
     return;
   }
   const assignment = await getRobotAssignment(undefined, reportRequest.client_id);
   const robot = await getRobotBySN(assignment.robot_serial_number);
-
+  
   await Promise.all([
     sendReportRequest(robot, reportRequest),
   ])

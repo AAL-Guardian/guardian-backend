@@ -3,7 +3,7 @@ import { DATETIME_FORMAT, executeStatement, insertStatement } from "./dao";
 import { MIN_WINDOW_DIFF } from "./schedule";
 
 export default async function logEvent(robotCode: string, eventName: string = "", eventData: string | unknown = "", clientId: string = null): Promise<void> {
-  console.info('inserting log', robotCode, eventName, eventData);
+  console.log('inserting log', robotCode, eventName, eventData);
   if (typeof eventData !== 'string') {
     eventData = JSON.stringify(eventData);
   }

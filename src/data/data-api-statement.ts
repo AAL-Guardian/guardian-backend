@@ -43,7 +43,7 @@ export async function executeStatement(sql: string, parameters?: SqlParameter[],
     console.log(e, sql, parameters);
     if (e?.code === 'BadRequestException') {
       if ((e?.message as string).startsWith('Communications link failure')) {
-        console.warn('Request timed out, cold start?');
+        console.log('Request timed out, cold start?');
         return await executeStatement(sql, parameters);
       }
     }
